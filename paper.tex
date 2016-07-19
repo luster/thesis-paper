@@ -1,0 +1,158 @@
+\documentclass[12pt]{article}
+\usepackage{currothesis}
+\usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{Adobe Caslon Pro}
+\usepackage{layout}
+\usepackage[]{amsmath}
+\usepackage{amssymb}
+\usepackage{ragged2e}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{caption} 
+\captionsetup[table]{skip=10pt}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{titlesec}
+
+\setcounter{secnumdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\def\toclevel@paragraph{4}
+\setcounter{tocdepth}{4}
+\pagestyle{plain}
+\setlength{\marginparwidth}{1in}
+
+\newcommand\tline[2]{$\underset{\text{#1}}{\text{\underline{\hspace{#2}}}}$}
+
+\begin{document}
+
+% Title page
+\thispagestyle{empty}
+\begin{center}
+\Large
+
+THE COOPER UNION\\
+ALBERT NERKEN SCHOOL OF ENGINEERING
+
+\vspace{1in}
+
+{
+\LARGE
+Alternative Architectures for \\Generative Adversarial Networks
+
+}
+
+\vspace{1in}
+
+by
+
+Christopher Curro
+
+\vspace*{\fill}
+
+A thesis submitted in partial fulfillment\\
+of the requirements for the degree of\\
+Master of Engineering
+
+\vspace{1in}
+
+September 2016
+
+\vspace{1in}
+
+Professor Sam Keene, Advisor
+
+\end{center}
+
+% Signature Page
+\newpage
+\thispagestyle{empty}
+\begin{center}
+\Large
+THE COOPER UNION FOR THE \\ADVANCEMENT OF SCIENCE AND ART
+
+\vspace{0.5in}
+
+ALBERT NERKEN SCHOOL OF ENGINEERING
+
+\vspace{1in}
+
+\justify
+
+This thesis was prepared under the direction of the Candidate's Thesis Advisor
+and has received approval. It was submitted to the Dean of the School of
+Engineering and the full Faculty, and was approved as partial fulfillment of
+the requirements for the degree of Master of Engineering.
+
+\raggedright
+
+\vspace{1in}
+
+\hfill \tline{Dean, School of Engineering \hfill Date}{3in}
+
+\vspace{1in}
+
+\tline{Prof. Sam Keene, Thesis Advisor \hfill Date}{3in}
+
+
+\end{center}
+
+\newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\newpage
+
+Ack
+
+\newpage
+
+Abstract
+
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+Table of Nomenclature
+
+\clearpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\fontsize{12pt}{24pt}\selectfont 
+\section{Introduction}
+\subsection{Machine Learning at Large}
+\input{intro/ml}
+\subsection{Neural Networks}
+\input{intro/nets}
+\subsection{Generative Models}
+\input{intro/gen}
+\section{System Description}
+\subsection{Energy distance matching}
+\subsection{Kernel based moment matching}
+\subsection{Convolutions with holes}
+\subsection{Style Loss term}
+\newpage
+
+\nocite{*}
+\fontsize{12pt}{16pt}\selectfont 
+\bibliography{bib}{}
+\bibliographystyle{IEEEtran}
+
+\end{document}
