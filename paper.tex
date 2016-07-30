@@ -2,7 +2,7 @@
 \usepackage{currothesis}
 \usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
 \usepackage{fontspec}
-\setmainfont{Adobe Caslon Pro}
+%\setmainfont{Adobe Caslon Pro}
 \usepackage{layout}
 \usepackage[]{amsmath}
 \usepackage{amssymb}
@@ -11,7 +11,7 @@
 \usepackage{cite}
 \usepackage{booktabs}
 \usepackage{tikz}
-\usepackage{caption} 
+\usepackage{caption}
 \captionsetup[table]{skip=10pt}
 \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
@@ -47,7 +47,7 @@ ALBERT NERKEN SCHOOL OF ENGINEERING
 
 {
 \LARGE
-Alternative Architectures for \\Generative Adversarial Networks
+A Deep Partitioned Autoencoder \\for De-Noising Live Audio
 
 }
 
@@ -55,7 +55,7 @@ Alternative Architectures for \\Generative Adversarial Networks
 
 by
 
-Christopher Curro
+Ethan Lusterman
 
 \vspace*{\fill}
 
@@ -135,8 +135,11 @@ Table of Nomenclature
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
-\fontsize{12pt}{24pt}\selectfont 
+\fontsize{12pt}{24pt}\selectfont
 \section{Introduction}
+\input{intro/intro}
+\newpage
+\section{Background}
 \subsection{Machine Learning at Large}
 \input{intro/ml}
 \subsection{Neural Networks}
@@ -151,7 +154,7 @@ Table of Nomenclature
 \newpage
 
 \nocite{*}
-\fontsize{12pt}{16pt}\selectfont 
+\fontsize{12pt}{16pt}\selectfont
 \bibliography{bib}{}
 \bibliographystyle{IEEEtran}
 
