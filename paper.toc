@@ -1,34 +1,13 @@
 \contentsline {section}{\numberline {1}Introduction}{1}
 \contentsline {section}{\numberline {2}Background}{2}
-\contentsline {subsection}{\numberline {2.1}Machine Learning at Large}{2}
-\contentsline {subsubsection}{\numberline {2.1.1}Differentiable parametric modeling}{3}
-\contentsline {subsubsection}{\numberline {2.1.2}Basis expansions}{3}
-\contentsline {subsubsection}{\numberline {2.1.3}Kernel methods}{5}
-\contentsline {subsubsection}{\numberline {2.1.4}Curse of dimensionality}{5}
-\contentsline {subsubsection}{\numberline {2.1.5}Over-fitting}{5}
-\contentsline {subsection}{\numberline {2.2}Neural Networks}{5}
-\contentsline {subsubsection}{\numberline {2.2.1}Neural networks as computational graphs}{5}
-\contentsline {subsubsection}{\numberline {2.2.2}Fully connected neural networks}{6}
-\contentsline {subsubsection}{\numberline {2.2.3}Convolutional neural networks}{9}
-\contentsline {subsubsection}{\numberline {2.2.4}Convolutions with holes}{9}
-\contentsline {subsubsection}{\numberline {2.2.5}Tranposed convolutions}{9}
-\contentsline {subsubsection}{\numberline {2.2.6}Additional techniques}{9}
-\contentsline {paragraph}{\numberline {2.2.6.1}Dropout}{9}
-\contentsline {paragraph}{\numberline {2.2.6.2}Batch normalization}{10}
-\contentsline {paragraph}{\numberline {2.2.6.3}Rectified linear units}{10}
-\contentsline {paragraph}{\numberline {2.2.6.4}Exponential linear units}{10}
-\contentsline {paragraph}{\numberline {2.2.6.5}Residual networks}{10}
-\contentsline {paragraph}{\numberline {2.2.6.6}Minibatch training}{10}
-\contentsline {paragraph}{\numberline {2.2.6.7}Intelligent parameter initialization}{11}
-\contentsline {paragraph}{\numberline {2.2.6.8}ADAM optimizer}{12}
-\contentsline {paragraph}{\numberline {2.2.6.9}Style loss}{12}
-\contentsline {subsection}{\numberline {2.3}Generative Models}{12}
-\contentsline {subsubsection}{\numberline {2.3.1}Generative models at large}{12}
-\contentsline {subsubsection}{\numberline {2.3.2}Generative adversarial networks}{12}
-\contentsline {subsubsection}{\numberline {2.3.3}Deep convolutional generative adversarial newtorks}{12}
-\contentsline {subsubsection}{\numberline {2.3.4}Additional techniques for traning generative adversarial networks}{12}
-\contentsline {section}{\numberline {3}System Description}{12}
-\contentsline {subsection}{\numberline {3.1}Energy distance matching}{12}
-\contentsline {subsection}{\numberline {3.2}Kernel based moment matching}{12}
-\contentsline {subsection}{\numberline {3.3}Convolutions with holes}{12}
-\contentsline {subsection}{\numberline {3.4}Style Loss term}{12}
+\contentsline {subsection}{\numberline {2.1}Machine Learning Overview}{2}
+\contentsline {subsubsection}{\numberline {2.1.1}Classification and Regression}{2}
+\contentsline {subsubsection}{\numberline {2.1.2}Supervised and Unsupervised Learning}{2}
+\contentsline {subsubsection}{\numberline {2.1.3}Overfitting and Curse of Dimensionality}{2}
+\contentsline {subsubsection}{\numberline {2.1.4}Loss functions and Regularization}{2}
+\contentsline {subsubsection}{\numberline {2.1.5}Gradient Stuff?}{2}
+\contentsline {subsection}{\numberline {2.2}Neural Networks}{2}
+\contentsline {subsubsection}{\numberline {2.2.1}Dense Layer}{2}
+\contentsline {subsubsection}{\numberline {2.2.2}Convolutional Layer}{2}
+\contentsline {subsubsection}{\numberline {2.2.3}Nonlinearity Choice}{2}
+\contentsline {section}{\numberline {3}System Description}{2}
