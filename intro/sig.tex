@@ -59,7 +59,13 @@ In this thesis, we also exploit the main duality between the time and frequency 
 This allows us to effectively treat our network as a non-linear filter that can denoise small time/frequency slices of our noisy signal, which can then be pieced back together using overlap-add resynthesis. We detail this in the next section.
 
 \subsubsection{Windowing and Perfect Reconstruction}
-Because we are training a network to denoise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT. [DSPBOOK] To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$.
+To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$. Because we are training a network to denoise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT. [DSPBOOK]
+
+
+
+
+Also, to be able to properly reconstruct our signal, we use a window function and overlapping frame percentage to accomplish perfect reconstruction.
+
 
 
 \subsubsection{Noise and Signal-to-Noise Ratio}
