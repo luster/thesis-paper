@@ -2,6 +2,7 @@ Domain knowledge of discrete audio signals and systems better informs our decisi
 
 \subsubsection{Signals}
 We deal exclusively with discrete-time audio signals in this thesis. A discrete-time audio signal $x[n]$ is represented as a sequence of numbers (samples), where each integer-valued slot $n$ in the sequence corresponds to a unit of time based on the sampling frequency $f_s$. This comes from sampling the continuous-time audio signal $x_c(t)$:
+
 \begin{equation}
 x[n] = x_c(nT)
 \end{equation}
@@ -12,24 +13,53 @@ For example, a 1-second speech signal sampled at 8kHz has 8000 samples. Furtherm
 We also assume signals collected have been properly sampled according to the Nyquist-Shannon sampling theorem, which states that a discrete-time signal must be sampled at at least twice the highest frequency present in the signal to prevent aliasing of different frequencies. For example, speech signals genearlly have information up to 8kHz, so many speech signals are sampled at 16kHz. Music is more complex in that signals often span up to about 20kHz, so CD quality recordings are often sampled at 44.1kHz or higher. For this thesis, we use recordings sampled at 44.1kHz or lower.
 
 
-\subsubsection{Convolution}
+\subsubsection{Convolution} % TODO: figure with basic flip/slide convolution
 The discrete-time convolution operation takes two sequences $x[n]$ and $h[n]$ and outputs a third sequence $y[n] = x[n] * h[n]$:
 
 \begin{equation}
 y[n] = \sum_{k=-\infty}^{\infty} x[k]h[n-k]
 \end{equation}
 
+Convolution is commutative, so $x[n] * h[n] = h[n] * x[n]$ holds true.
+
 A linear, time-invariant (LTI) system is characterized by its impulse response $h[n]$, which allows us to determine samples $y[n]$ when $x[n]$ is subject to $h[n]$. For the purposes of this thesis, our underlying clean signal $x[n]$ might be subject to the conditions of an acoustic environment $h[n]$ and crowd noise $N[n]$:
+
 \begin{equation}
 y[n] = h[n]*x[n]+N[n]
 \end{equation}
 
-In this scenario, our system would attempt to recover $h[n]*x[n]$ and possibly $x[n]$ if the acoustic environment were deemed ``noisy enough.''
+In this scenario, our system would attempt to recover $h[n]*x[n]$ and possibly even $x[n]$ if the acoustic environment were deemed ``noisy enough'' due to echo and reverberation.
 
-One of our proposed systems also incorporates convolutional neural networks (CNN), which use convolutions between samples instead of simple linear combinations (discussed later).
+One of our proposed systems also incorporates convolutional neural networks (CNN) which use convolutions between frames of samples instead of simple linear combinations (discussed later).
 
-\subsubsection{Frequency Transforms}
+\subsubsection{Frequency Transforms} % TODO: figure with time and frequency graph
+In some of our proposed systems, we use a frequency transformed version of the input signal as a preprocessing step to the system input. While no new information is gained from transforming the input, networks often respond better to determining the value of the magnitude of varying frequencies at a time slice instead of the individual time samples.
 
+The frequency transform we use in this thesis is the discrete-time Fourier transform (DTFT). A sequence of $N$ discrete-time samples is transformed into another sequence of $N$ samples where each index then corresponds to a frequency bin. The DTFT $X[k]$ of a signal $x[n]$ is given by the following:
 
+\begin{equation}
+X[k] = \sum_{n=0}^{N-1} x[n] W_N^{kn}
+\end{equation}
+
+where the twiddle factor $W_N$ is given by $W_N=e^{-j(2\pi/N)}$. Then the reconstruction of $x[n]$ from $X[k]$ is given by:
+
+\begin{equation}
+x[n]=\dfrac{1}{N} \sum_{k=0}^{N-1} X[k] W_N^{-kn}
+\end{equation}
+
+In this thesis, we also exploit the main duality between the time and frequency domain using the convolution theorem, which states that convolution in time is equivalent to multiplication in frequency and vise versa:
+
+\begin{equation}
+\mathscr{F} \{h[n] * x[n]\} = H[k] X[k]
+\end{equation}
+\begin{equation}
+\mathscr{F}^{-1} \{H[k] * X[k]\} = h[n] x[n]
+\end{equation}
+
+This allows us to effectively treat our network as a non-linear filter that can denoise small time/frequency slices of our noisy signal, which can then be pieced back together using overlap-add resynthesis. We detail this in the next section.
 
 \subsubsection{Windowing and Perfect Reconstruction}
+
+
+
+\subsubsection{Noise and Signal-to-Noise Ratio}
