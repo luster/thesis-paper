@@ -14,8 +14,9 @@
 \contentsline {subsubsection}{\numberline {2.3.2}Convolution}{4}
 \contentsline {subsubsection}{\numberline {2.3.3}Frequency Transforms}{5}
 \contentsline {subsubsection}{\numberline {2.3.4}Windowing and Perfect Reconstruction}{6}
-\contentsline {subsubsection}{\numberline {2.3.5}Noise and Signal-to-Noise Ratio}{7}
-\contentsline {subsubsection}{\numberline {2.3.6}Magnitude and Phase Spectrum}{7}
+\contentsline {subsubsection}{\numberline {2.3.5}Window Size and Frequency v. Time Resolution Tradeoff}{7}
+\contentsline {subsubsection}{\numberline {2.3.6}Noise and Signal-to-Noise Ratio}{7}
+\contentsline {subsubsection}{\numberline {2.3.7}Magnitude and Phase Spectrum}{7}
 \contentsline {section}{\numberline {3}System Description}{8}
 \contentsline {section}{\numberline {4}Results}{9}
 \contentsline {section}{\numberline {5}Conclusions and Future Work}{10}
