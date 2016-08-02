@@ -59,13 +59,20 @@ In this thesis, we also exploit the main duality between the time and frequency 
 This allows us to effectively treat our network as a non-linear filter that can denoise small time/frequency slices of our noisy signal, which can then be pieced back together using overlap-add resynthesis. We detail this in the next section.
 
 \subsubsection{Windowing and Perfect Reconstruction}
-To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$. Because we are training a network to denoise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT. [DSPBOOK]
+To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$. Because we are training a network to denoise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT and helps to prevent spectral leakage. [DSPBOOK]
 
+Also, to be able to properly reconstruct our signal, we use a window function and corresponding overlapping frame percentage to accomplish perfect reconstruction. The corresponding overlapping frame percentage is set such that the window sums to a constant for all time. For example, a rectangular window $w[n]=1$ over an interval of length $N$ has an overlap of 0\% to sum to a constant 1 for all time. Another popular window is the Hanning window, defined over an interval $N$ by the following:
 
+\begin{equation}
+w[n] = \dfrac{1}{2} \bigg( 1-\cos \bigg(\dfrac{2 \pi n}{N - 1} \bigg)\bigg)
+\end{equation}
 
-
-Also, to be able to properly reconstruct our signal, we use a window function and overlapping frame percentage to accomplish perfect reconstruction.
-
-
+For the Hann window, the perfect reconstruction overlap is a frame length of $N=50\%$.
 
 \subsubsection{Noise and Signal-to-Noise Ratio}
+Since we are trying to denoise audio signals, we must discuss how we measure noise. One of the most common measures of degradation of signal quality from additive noise is signal-to-noise ratio (SNR), defined as the ratio of signal variance to noise variance. [DSP] For the signal $y[n] = x[n] + N[n]$, where $x[n]$ is the signal of interest and $N[n]$ is the additive noise, the SNR is defined as
+
+\begin{equation}
+SNR = \dfrac{\sigma_{x}^2}{\sigma_{n}^2}
+\end{equation}
+
