@@ -3,10 +3,10 @@ Machine learning involves the use of computer algorithms to make decisions based
 
 Problems where training data contain input data vectors as well as the correct output vectors (targets) are known as supervised learning problems. Training a model to denoise audio where noise was introduced to the clean audio would be a supervised learning problem. On the other hand, training a model to denoise audio where the underlying clean signal is not known is an unsupervised learning problem. Different loss functions and neural network architectures can be exploited to accomplish denoising without the clean data.
 
-For the purposes of this thesis, we use machine learning to determine an underlying nonlinear function that removes noise from time slices of audio (i.e. regression). These slices can then be pieced back together through overlap-add resynthesis.
+For the purposes of this thesis, we use machine learning to determine an underlying nonlinear function that removes noise from time slices of audio (i.e. regression). These slices can then be pieced back together through overlap-add resynthesis. To clarify, this is a general linear model that maps an input noisy audio vector $y[n]=x[n]+N[n]$ to $\tilde{x}[n]$, a target denoised audio vector, where $x[n]$ is the underlying clean signal and $N[n]$ is the additive background noise.
 
 \subsubsection{Regression}
-
+A classical regression technique is linear regression, where one or more independent variables $x_{i}$ are used to determine a scalar dependent variable $y$. The case of a single independent variable $x$ is known as simple linear regression. On the other hand, the case of estimating  A canonical example would be estimating a sine wave $x[n]$ given noisy samples
 
 
 \subsubsection{Overfitting and Curse of Dimensionality}
