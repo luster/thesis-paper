@@ -1,0 +1,33 @@
+simulation
+
+input data - an audio file or two
+    input snr
+    baseline mse
+    generate something?
+    sample rate
+some configuration
+    window / hop
+    frame length
+    preproc?
+    frequency transform or not?
+    more preproc?
+    network?
+        type
+        layer sizes
+        loss func
+        training updates
+    running sim
+        what to collect
+        how many iterations
+    result
+        what figures/metrics to save
+        model to save
+
+standard
+========
+pass a time signal - default is speech? sine?
+pass a noise signal - default is awgn? bar noise?
+specify snr for simulation - default is 10dB? something else?
+sample rate - default is 44.1kHz? maybe lower for faster training
+window - default it hanning + 50% overlap (or 75%)
+frame length - default should be power of 2 around 10-15 msec - 4096?
