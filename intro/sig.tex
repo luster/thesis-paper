@@ -70,6 +70,9 @@ w[n] = \dfrac{1}{2} \bigg( 1-\cos \bigg(\dfrac{2 \pi n}{N - 1} \bigg)\bigg)
 For the Hann window, the perfect reconstruction overlap is a frame length of $N=50\%$.
 
 \subsubsection{Window Size and Frequency v. Time Resolution Tradeoff}
+We must consider window size as a hyperparameter to our system. In general, shorter windows give rise to better time resolution at the cost of frequency resolution. On the other hand, longer windows give rise to better frequency resolution at the cost of time resolution. To illustrate, consider FIGURE.
+
+
 
 \subsubsection{Noise and Signal-to-Noise Ratio}
 Since we are trying to denoise audio signals, we must discuss how we measure noise. One of the most common measures of degradation of signal quality from additive noise is signal-to-noise ratio (SNR), defined as the ratio of signal variance to noise variance. [DSP] For the signal $y[n] = x[n] + N[n]$, where $x[n]$ is the signal of interest and $N[n]$ is the additive noise, the SNR is defined as

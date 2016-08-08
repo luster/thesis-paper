@@ -15,7 +15,7 @@
 % instead.
 %
 % If using 2.09 compatibility mode, you need to include the command
-%             \documentstyle[nips10submit_09,times]{article} 
+%             \documentstyle[nips10submit_09,times]{article}
 % as the first line in your document.  Or, if you do not have Times
 % Roman font available, you can include the command
 %             \documentstyle[nips10submit_09]{article}
@@ -25,12 +25,12 @@
 %       changed, they will require corresponding changes in the
 %       maketitle section.
 %
-\usepackage{eso-pic} % used by \AddToShipoutPicture 
+\usepackage{eso-pic} % used by \AddToShipoutPicture
 
 \renewcommand{\topfraction}{0.95}   % let figure take up nearly whole page
 \renewcommand{\textfraction}{0.05}  % let figure take up nearly whole page
 
-% Define nipsfinal, set to true if nipsfinalcopy is defined  
+% Define nipsfinal, set to true if nipsfinalcopy is defined
 \newif\ifnipsfinal
 \nipsfinalfalse
 \def\nipsfinalcopy{\nipsfinaltrue}
@@ -57,7 +57,7 @@
 % \thispagestyle{empty}        \pagestyle{empty}
 % \flushbottom \sloppy
 
-% We're never going to need a table of contents, so just flush it to 
+% We're never going to need a table of contents, so just flush it to
 % save space --- suggested by drstrip@sandia-2
 % \def\addcontentsline#1#2#3{}
 
@@ -75,10 +75,10 @@
 \parsep 2pt plus 1pt minus 0.5pt
 \parskip .5pc
 
-%\leftmargin2em 
+%\leftmargin2em
 \leftmargin3pc
 \leftmargini\leftmargin \leftmarginii 2em
-\leftmarginiii 1.5em \leftmarginiv 1.0em \leftmarginv .5em 
+\leftmarginiii 1.5em \leftmarginiv 1.0em \leftmarginv .5em
 
 %\labelsep \labelsep 5pt
 
@@ -90,7 +90,7 @@
    \itemsep \parsep}
 \def\@listiii{\leftmargin\leftmarginiii
     \labelwidth\leftmarginiii\advance\labelwidth-\labelsep
-    \topsep 1pt plus 0.5pt minus 0.5pt 
+    \topsep 1pt plus 0.5pt minus 0.5pt
     \parsep \z@ \partopsep 0.5pt plus 0pt minus 0.5pt
     \itemsep \topsep}
 \def\@listiv{\leftmargin\leftmarginiv
