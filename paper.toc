@@ -17,10 +17,11 @@
 \contentsline {subsubsection}{\numberline {2.3.5}Window Size and Frequency v. Time Resolution Tradeoff}{7}
 \contentsline {subsubsection}{\numberline {2.3.6}Noise and Signal-to-Noise Ratio}{7}
 \contentsline {subsubsection}{\numberline {2.3.7}Magnitude and Phase Spectrum}{7}
-\contentsline {section}{\numberline {3}System Description}{8}
-\contentsline {section}{\numberline {4}Results}{9}
-\contentsline {section}{\numberline {5}Conclusions and Future Work}{10}
-\contentsline {subsection}{\numberline {5.1}Conclusions}{10}
-\contentsline {subsection}{\numberline {5.2}Future Work}{10}
-\contentsline {subsubsection}{\numberline {5.2.1}Models}{10}
-\contentsline {subsubsection}{\numberline {5.2.2}Data}{10}
+\contentsline {section}{\numberline {3}Signal Model and Data}{8}
+\contentsline {section}{\numberline {4}De-noising Architectures}{9}
+\contentsline {section}{\numberline {5}Results}{10}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{11}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{11}
+\contentsline {subsection}{\numberline {6.2}Future Work}{11}
+\contentsline {subsubsection}{\numberline {6.2.1}Models}{11}
+\contentsline {subsubsection}{\numberline {6.2.2}Data}{11}

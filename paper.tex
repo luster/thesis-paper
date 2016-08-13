@@ -160,11 +160,17 @@ Table of Nomenclature
 \input{intro/sig}
 \newpage
 
-\section{System Description}
+\section{Signal Model and Data}
+% explain your simulation set up, how you have clean signal, a noise signal and then a clean + noise signal. Also describe exactly what the signals you are gonna experiment with are, sine waves? clean sound + captured crowd noise? just lay all that out.
+\newpage
+
+\section{De-noising Architectures}
+% first section should be classic supervised auto-encoder and maybe paris auto-encoder. then the next section can be dan stowells thing, and then finally the curro-net.
 \newpage
 
 
 \section{Results}
+% just show the MSE plots for all the de-noising systems, as well as plots of your loss function convergence and shit like that. Basically dump all the plots you can into this section, arrange them in the same order as the previous chapter. You can put histograms of the latents in the dan stowell section bc that is basically how curro showed us that its not really working all that well, and then that motivates the curro-net. (he hates that name btw so we should try to keep it). hopefully the curro net gives good results when trained with only noise and signal + noise. be sure to be clear in this section that the classic auto-encoder is more supervised than the stowell and curro-net ones are. you can also include a section in here on your phase reconstruction results bc its relevant and you did all that work so might as well beef up your thesis with it.
 \input{results/main}
 \newpage
 
