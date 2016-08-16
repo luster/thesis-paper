@@ -1,18 +1,23 @@
 % explain your simulation set up, how you have clean signal, a noise signal and then a clean + noise signal. Also describe exactly what the signals you are gonna experiment with are, sine waves? clean sound + captured crowd noise? just lay all that out.
 
-\subsubsection{Network Input and Output}
+\subsection{Network Input and Output}
 To simulate an audio denoising scheme, we define the following inputs and outputs. We take a known clean signal $x[n]$ which we subject to additive noise $N[n]$ using a specified SNR, resulting in the following noisy signal $y[n]$:
 
 \begin{equation}
 y[n] = x[n] + N[n]
 \end{equation}
 
-To achieve a particular average SNR per simulation, we take the average signal energy for each minibatch of size $B$ to determine a multiplicative scale factor $k$ on the noise signal $N[n]$:
+To achieve a particular average SNR per simulation, we take the average signal energy for each minibatch of size $B$ to determine a multiplicative scale factor $k$ on the noise signal $N[n]$. For example, for additive white Gaussian noise (AWGN), we sample from the zero-mean, unit variance normal distribution (``randn'' in Python) and determine our scale factor $k$ as $\sigma$ using the specified SNR in decibels:
 
 \begin{equation}
-\dfrac{1}{BN}\sum_{b=0}^{B-1} \sum_{n=0}^{N-1} x_{b}^{2}[n]
+\sigma_n^{2} = \dfrac{\dfrac{1}{BN}\sum_{b=0}^{B-1} \sum_{n=0}^{N-1} x_{b}^{2}[n]}{SNR_{lin}}
 \end{equation}
 
+where $SNR_{lin}$ is given by
+
+\begin{equation}
+SNR_{lin} = 10^{\frac{SNR_{db}}{10}}
+\end{equation}
 
 In supervised scenarios, we allow the network to train with access to the ground truth $x[n]$. On the other hand, in semi-supervised scenarios, we only allow the network to train with access to a ``soft label'' indicating if the signal is (1) noise-only or (2) noise and possibly signal. [DanStowell] However, in both supervised and semi-supervised scenarios, our neural network input is one of the following:
 
@@ -23,9 +28,12 @@ In supervised scenarios, we allow the network to train with access to the ground
     \item Complex spectrogram frames of $Y[k]$
 \end{enumerate}
 
-We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames. (Anything to add about phase denoising and failures here?)
+We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames with a Hanning window with 50\% overlap unless otherwise specified.
 
-\subsubsection{Signal and Noise Choices}
+
+Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames. (Anything to add about phase denoising and failures here?)
+
+\subsection{Signal and Noise Choices}
 Our choice of signals include the following:
 
 \begin{enumerate}
@@ -42,5 +50,7 @@ Similarly, our choice of noise signals include the following:
     \item Restaurant noise
 \end{enumerate}
 
-\subsubsection{Other Hyperparameter Choices}
-% batch size,
+As mentioned above, we can use the average energy per minibatch to specify a given SNR for an experiment. We take several combinations of clean and noise signals and compare across multiple SNRs.
+
+\subsection{Other Network Choices}
+Since our networks involve one or more neural network layers, we show
