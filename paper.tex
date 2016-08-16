@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{currothesis}
 \usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
+\usepackage{mathtools}
 \usepackage{fontspec}
 %\setmainfont{Adobe Caslon Pro}
 \usepackage{layout}
@@ -13,6 +14,11 @@
 \usepackage{booktabs}
 \usepackage{tikz}
 \usepackage{caption}
+
+% Problem with these declarations which I like to use
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
 \captionsetup[table]{skip=10pt}
 \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
@@ -161,10 +167,11 @@ Table of Nomenclature
 \newpage
 
 \section{Signal Model and Data}
-% explain your simulation set up, how you have clean signal, a noise signal and then a clean + noise signal. Also describe exactly what the signals you are gonna experiment with are, sine waves? clean sound + captured crowd noise? just lay all that out.
+\input{beef/model}
 \newpage
 
 \section{De-noising Architectures}
+\input{beef/arch}
 % first section should be classic supervised auto-encoder and maybe paris auto-encoder. then the next section can be dan stowells thing, and then finally the curro-net.
 \newpage
 
