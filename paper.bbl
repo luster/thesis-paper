@@ -98,4 +98,9 @@ S.~Dieleman, J.~Schlüter, C.~Raffel, E.~Olson, S.~K. Sønderby, D.~Nouri,
   Aug. 2015. [Online]. Available: \url{http://dx.doi.org/10.5281/zenodo.27878}
 \BIBentrySTDinterwordspacing
 
+\bibitem{ioffe2015batch}
+S.~Ioffe and C.~Szegedy, ``Batch normalization: Accelerating deep network
+  training by reducing internal covariate shift,'' \emph{arXiv preprint
+  arXiv:1502.03167}, 2015.
+
 \end{thebibliography}

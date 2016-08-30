@@ -28,8 +28,18 @@ In supervised scenarios, we allow the network to train with access to the ground
     \item Complex spectrogram frames of $Y[k]$
 \end{enumerate}
 
-We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames with a Hanning window with 50\% overlap unless otherwise specified.
+We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames at 16 kHz with a Hanning window with 50\% overlap unless otherwise specified. In addition, for frequency frames, we use an FFT length the same length as our frame for a total of $L/2$ frequency bins. Note that our choice of frame length and sampling rate allows us to balance time and frequency resolution. With the given frame length and sampling rate, we achieve a frequency resolution of 15.625 Hz/bin by the following:
 
+\begin{align}
+\dfrac{f_s/2 \:\text{Hz}}{N/2 \:\text{bins}} &= \dfrac{fs}{N}\\
+&= 15.625 \:\text{Hz/bin}
+\end{align}
+
+Similary, our time resolution is given by
+
+\begin{equation}
+\dfrac{N}{fs} = 64 \:\text{msec} 
+\end{equation}
 
 Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames. (Anything to add about phase denoising and failures here?)
 

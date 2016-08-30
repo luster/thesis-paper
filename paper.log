@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2016.8.2)  29 AUG 2016 20:21
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2016.8.2)  29 AUG 2016 21:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1075,13 +1075,13 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 (./intro/intro.tex) [1
 
 ] (./intro/ml.tex [2]) (./intro/nets.tex)
-(./intro/sig.tex [3] [4] [5] [6]) [7] (./beef/model.tex [8]
-Overfull \hbox (0.80705pt too wide) in paragraph at lines 40--41
+(./intro/sig.tex [3] [4] [5] [6]) [7] (./beef/model.tex [8] [9]
+Overfull \hbox (0.80705pt too wide) in paragraph at lines 50--51
 []\EU1/lmr/m/n/12 Sine waves with multiple frequencies and random amplitudes an
 d phases 
  []
 
-[9]) [10] (./beef/arch.tex) [11] (./results/main.tex
+) [10] (./beef/arch.tex) [11] (./results/main.tex
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf Graphic file (t
 ype QTm)
 
@@ -1165,10 +1165,10 @@ See the caption package documentation for explanation.
 
 [21] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 28261 strings out of 493638
- 573396 string characters out of 6146797
+ 28262 strings out of 493638
+ 573412 string characters out of 6146797
  547492 words of memory out of 5000000
- 31230 multiletter control sequences out of 15000+600000
+ 31231 multiletter control sequences out of 15000+600000
  13355 words of font info for 69 fonts, out of 8000000 for 9000
  1328 hyphenation exceptions out of 8191
  55i,12n,69p,10364b,328s stack positions out of 5000i,500n,10000p,200000b,80000s

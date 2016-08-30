@@ -19,7 +19,7 @@
 \contentsline {subsubsection}{\numberline {2.3.7}Magnitude and Phase Spectrum}{7}
 \contentsline {section}{\numberline {3}Signal Model and Data}{8}
 \contentsline {subsection}{\numberline {3.1}Network Input and Output}{8}
-\contentsline {subsection}{\numberline {3.2}Signal and Noise Choices}{9}
+\contentsline {subsection}{\numberline {3.2}Signal and Noise Choices}{10}
 \contentsline {subsection}{\numberline {3.3}Other Network Parameters}{10}
 \contentsline {section}{\numberline {4}De-noising Architectures}{11}
 \contentsline {subsection}{\numberline {4.1}Classic Supervised Autoencoder}{11}
