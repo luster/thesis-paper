@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2016)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: paper.aux
 The style file: IEEEtran.bst
@@ -15,45 +15,45 @@ Warning--empty journal in kayserdenoising
 Warning--empty year in kayserdenoising
 
 Done.
-You've used 16 entries,
+You've used 19 entries,
             4087 wiz_defined-function locations,
-            912 strings with 10137 characters,
-and the built_in function-call counts, 10888 in all, are:
-= -- 827
-> -- 313
-< -- 72
-+ -- 164
-- -- 61
-* -- 519
-:= -- 1645
-add.period$ -- 32
-call.type$ -- 16
-change.case$ -- 14
-chr.to.int$ -- 168
-cite$ -- 18
-duplicate$ -- 790
-empty$ -- 899
-format.name$ -- 74
-if$ -- 2508
+            925 strings with 10563 characters,
+and the built_in function-call counts, 12803 in all, are:
+= -- 963
+> -- 368
+< -- 83
++ -- 192
+- -- 71
+* -- 605
+:= -- 1915
+add.period$ -- 38
+call.type$ -- 19
+change.case$ -- 20
+chr.to.int$ -- 198
+cite$ -- 21
+duplicate$ -- 928
+empty$ -- 1078
+format.name$ -- 87
+if$ -- 2959
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 151
-newline$ -- 77
-num.names$ -- 16
-pop$ -- 388
+int.to.str$ -- 19
+missing$ -- 180
+newline$ -- 88
+num.names$ -- 21
+pop$ -- 474
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 835
+skip$ -- 978
 stack$ -- 0
-substring$ -- 406
-swap$ -- 606
-text.length$ -- 16
+substring$ -- 477
+swap$ -- 708
+text.length$ -- 17
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 16
+type$ -- 19
 warning$ -- 2
-while$ -- 44
-width$ -- 18
-write$ -- 169
+while$ -- 51
+width$ -- 21
+write$ -- 195
 (There were 2 warnings)
