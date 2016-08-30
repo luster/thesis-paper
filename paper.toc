@@ -29,11 +29,14 @@
 \contentsline {subsection}{\numberline {4.4}Curro Autoencoder}{11}
 \contentsline {section}{\numberline {5}Results}{12}
 \contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{12}
-\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{13}
-\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{14}
-\contentsline {subsection}{\numberline {5.4}Comparison}{14}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{15}
-\contentsline {subsection}{\numberline {6.1}Conclusions}{15}
-\contentsline {subsection}{\numberline {6.2}Future Work}{16}
-\contentsline {subsubsection}{\numberline {6.2.1}Models}{16}
-\contentsline {subsubsection}{\numberline {6.2.2}Data}{17}
+\contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{12}
+\contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{12}
+\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{12}
+\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{12}
+\contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{12}
+\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{12}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{13}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{13}
+\contentsline {subsection}{\numberline {6.2}Future Work}{14}
+\contentsline {subsubsection}{\numberline {6.2.1}Models}{14}
+\contentsline {subsubsection}{\numberline {6.2.2}Data}{15}

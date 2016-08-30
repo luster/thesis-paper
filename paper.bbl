@@ -21,7 +21,7 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{DBLP:journals/corr/StowellT15}
+\bibitem{stow}
 \BIBentryALTinterwordspacing
 D.~Stowell and R.~E. Turner, ``Denoising without access to clean data using a
   partitioned autoencoder,'' \emph{CoRR}, vol. abs/1509.05982, 2015. [Online].

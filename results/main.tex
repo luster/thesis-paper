@@ -1,18 +1,34 @@
 \subsection{Supervised Autoencoder}
 
+For the following results, we show 
+
+\subsubsection{Batch Normalized Input}
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-loss}
-\caption{}
+\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-mse}
-\caption{}
+\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
 \end{figure}
 
+\subsubsection{Non-Batch Normalized Input}
 
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-loss}
+\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-mse}
+\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
+\end{figure}
 
 
 \subsection{Partitioned Autoencoder}
@@ -20,13 +36,13 @@
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss}
-\caption{}
+\caption{Loss at various SNRs for Single-Layer Partitioned Autoencoder\cite{stow}}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse}
-\caption{}
+\caption{MSE at various SNRs for Single-Layer Partitioned Autoencoder\cite{stow}}
 \end{figure}
 
 \subsection{Partitioned Curro Autoencoder}
@@ -34,45 +50,78 @@
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/curro-loss}
-\caption{}
+\caption{Loss at various SNRs for Single-Layer Curro Autoencoder}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/curro-mse}
-\caption{}
+\caption{MSE at various SNRs for Single-Layer Curro Autoencoder}
+\end{figure}
+
+\subsection{Comparison of Loss Convergence}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss--6}
+\caption{Loss Comparison of Various Networks at -6 dB}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss--3}
+\caption{Loss Comparison of Various Networks at -3 dB}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-0}
+\caption{Loss Comparison of Various Networks at 0 dB}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-3}
+\caption{Loss Comparison of Various Networks at 3 dB}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-6}
+\caption{Loss Comparison of Various Networks at 6 dB}
 \end{figure}
 
 
 
-\subsection{Comparison}
+\subsection{Comparison of Mean Squared Error Convergence}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--6}
-\caption{}
+\caption{MSE Comparison of Networks at -6 dB}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--3}
-\caption{}
+\caption{MSE Comparison of Networks at -3 dB}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-0}
-\caption{}
+\caption{MSE Comparison of Networks at 0 dB}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-3}
-\caption{}
+\caption{MSE Comparison of Networks at 3 dB}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6}
-\caption{}
+\caption{MSE Comparison of Networks at 6 dB}
 \end{figure}
+
