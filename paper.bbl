@@ -32,7 +32,7 @@ D.~Stowell and R.~E. Turner, ``Denoising without access to clean data using a
 D.~Liu, P.~Smaragdis, and M.~Kim, ``Experiments on deep learning for speech
   denoising.'' in \emph{INTERSPEECH}, 2014, pp. 2685--2689.
 
-\bibitem{bishop2006pattern}
+\bibitem{bishop}
 C.~M. Bishop, \emph{Pattern recognition and machine learning}.\hskip 1em plus
   0.5em minus 0.4em\relax springer, 2006.
 

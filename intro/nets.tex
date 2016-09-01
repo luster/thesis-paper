@@ -1,7 +1,46 @@
 % Basic explanation of NN
-In this thesis, we deal only with feed-forward neural networks, which are essentially directed acyclic graphs (DAG) for computation. In other words, information only moves through the network in one direction.
+In this thesis, we deal only with feed-forward neural networks, which are essentially directed acyclic graphs (DAG) for computation. In other words, information only moves through the network in one direction. An example neural network is shown in Figure \ref{fig:nn}.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=.8\textwidth]{neural-network-texexample-net}
+\caption[Example neural network]{An example neural network. There are 4 input variables, 1 hidden layer with 5 neurons, and 1 output variable.}
+\label{fig:nn}
+\end{figure}
+
+The connections in a nerual network can be represented by linear combinations of the input variables with learned weights $\vec{w}$. \cite{bishop} Unlike standard linear models however, neural networks apply a nonlinear activation $f(\centerdot)$ at the output of each neuron. The circle nodes in a neural network diagram can be thought of as the sum of the linear combinations of the connection edges and the application of the bias and activation function. Therefore, a hidden neuron $z_{j}$ in a network with $N$ input variable nodes, $M$ hidden nodes, and $K$ output nodes takes on the value
+
+\begin{equation}
+z_j = f(a_j)
+\end{equation}
+
+where the activiation $a_j$ is given by
+
+\begin{equation}
+a_j = \sum_{i=1}^{N} w_{ji}^{(1)}x_i + w_{j0}^{(1)}
+\end{equation}
+
+The connection values $w_{ji}$ are referred to as weights, and the scalars $w_{j0}$ are referred to as biases. Note that the superscripted numbers refer to the Then, the output $y_{k}$ is given by
+
+\begin{equation}
+y_k = g(a_k)
+\end{equation}
+
+where the output activation $a{k}$ is given by
+
+\begin{equation}
+a_k = \sum_{j=1}^{M} w_{kj}^{(2)} z_j + w_{k0}^{(2)}
+\end{equation}
+
+We are free to choose activation functions, which we will discuss later. However, note that at the output, the function $g(\centerdot)$ is often an identity for regression problems and a sigmoid $\sigma(\centerdot)$ for classification problems.
+
+Often, the weights and biases are grouped into a weight vector $\vec{w}$. In other words, similar to the linear models described earlier, a neural network is a nonlinear function of input variables $\{x_i\}$ to output variables $\{y_k\}$ where the parameters of the function are learned via training techniques.
 
 \subsubsection{Dense Layer}
+
+Described in the previous section, we refer to a dense layer as a fully connected neural network, in which no interconnections between neurons are missing.
+
+\subsubsection{Autoencoder}
 
 
 
