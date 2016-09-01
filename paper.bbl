@@ -28,13 +28,13 @@ D.~Stowell and R.~E. Turner, ``Denoising without access to clean data using a
   Available: \url{http://arxiv.org/abs/1509.05982}
 \BIBentrySTDinterwordspacing
 
-\bibitem{bishop2006pattern}
-C.~M. Bishop, \emph{Pattern recognition and machine learning}.\hskip 1em plus
-  0.5em minus 0.4em\relax springer, 2006.
-
 \bibitem{liu2014experiments}
 D.~Liu, P.~Smaragdis, and M.~Kim, ``Experiments on deep learning for speech
   denoising.'' in \emph{INTERSPEECH}, 2014, pp. 2685--2689.
+
+\bibitem{bishop2006pattern}
+C.~M. Bishop, \emph{Pattern recognition and machine learning}.\hskip 1em plus
+  0.5em minus 0.4em\relax springer, 2006.
 
 \bibitem{baldi2012complex}
 P.~Baldi and Z.~Lu, ``Complex-valued autoencoders,'' \emph{Neural Networks},
