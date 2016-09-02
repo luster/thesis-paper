@@ -19,6 +19,7 @@ plt.xlabel('x')
 plt.ylabel('y')#, rotation=0)
 plt.title('Modified Rectified Linear Activation Function (mReLU)')
 plt.plot(n, x)
+plt.ylim(-.2,.8)
 outfname = 'mrelu.pdf'
 plt.tight_layout()
 plt.savefig(outfname, format='pdf', bbox_inches='tight')
