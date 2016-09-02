@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  2 SEP 2016 16:14
+This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  2 SEP 2016 16:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1088,16 +1088,16 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 ] [2] (./intro/ml.tex [3]) (./intro/nets.tex
 File: figures/neural-network-texexample-net.pdf Graphic file (type QTm)
 
-<use  "figures/neural-network-texexample-net.pdf" > [4] [5] [6] [7])
-(./intro/sig.tex [8] [9] [10] [11] [12]) [13] (./beef/model.tex [14] [15]
+<use  "figures/neural-network-texexample-net.pdf" > [4] [5] [6] [7] [8])
+[9] (./intro/sig.tex [10] [11] [12] [13]) [14] (./beef/model.tex [15] [16]
 Overfull \hbox (0.80705pt too wide) in paragraph at lines 50--51
 []\EU1/lmr/m/n/12 Sine waves with multiple frequencies and random amplitudes an
 d phases 
  []
 
-) [16] (./beef/arch.tex [17]
+) [17] (./beef/arch.tex [18]
 File: figures/mrelu.pdf Graphic file (type QTm)
- <use  "figures/mrelu.pdf" > [18]) [19]
+ <use  "figures/mrelu.pdf" > [19]) [20]
 (./results/main.tex
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf Graphic file (t
 ype QTm)
@@ -1171,28 +1171,28 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf Graphic f
 ile (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf" >)
-[20] (./conc.tex
+[21] (./conc.tex
 Overfull \vbox (10.01402pt too high) has occurred while \output is active []
 
 
-[21]) [22] [23] (./paper.bbl [24] [25] [26] [27] [28]
-Underfull \hbox (badness 1038) in paragraph at lines 120--123
+[22]) [23] [24] (./paper.bbl [25] [26] [27] [28] [29]
+Underfull \hbox (badness 1038) in paragraph at lines 129--132
 []\EU1/lmr/m/n/12 (2010) Denoising autoencoders (da). [Online]. Available:
  []
 
-)
+[30])
 
 Package caption Warning: Unused \captionsetup[table] on input line 24.
 See the caption package documentation for explanation.
 
-[29] (./paper.aux) ) 
+[31] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 28353 strings out of 493591
- 576912 string characters out of 6143546
+ 28355 strings out of 493591
+ 576947 string characters out of 6143546
  548615 words of memory out of 5000000
- 31316 multiletter control sequences out of 15000+600000
+ 31318 multiletter control sequences out of 15000+600000
  13379 words of font info for 72 fonts, out of 8000000 for 9000
  1347 hyphenation exceptions out of 8191
- 55i,12n,69p,10364b,328s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,12n,69p,10364b,330s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.pdf (37 pages).
+Output written on paper.pdf (39 pages).

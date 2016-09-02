@@ -48,7 +48,13 @@ An autoencoder is normally an abstraction of neural networks in which an encode 
 
 
 
-\subsubsection{Weight Updates}
+\subsubsection{Network Training}
+
+In order to train a neural network, we must update the weights such that we minimize a loss function, often some kind of sum-of-square error function. \cite{bishop}
+
+
+
+\subsubsection{Regularization}
 
 
 
@@ -72,7 +78,7 @@ Note that the hyperbolic tangent function has an output on the range $(-1,1)$.
 
 Generally, our choice of nonlinearity should be chosen such that the expected range of desired output matches the nonlinearity's. In the case of audio denoising, different activations can be chosen depending on the input format. For example, time-domain audio frames are often processed with a digital floating point representation on the range of $[-1,1]$. In such a case, the hyperbolic tangent might be appropriate. On the other hand, if we were working with magnitude spectra of an audio signal, we would use a linearity with an output range of $[0,\infty]$.
 
-Recently, a more popular activation function which has in use is the rectified linear unit (ReLU). the ReLU is defined by the following:
+Recently, a more popular activation function which has in use is the rectified linear unit (ReLU). \cite{glorot2011deep} The ReLU is defined by the following:
 
 \begin{equation}
 g(x) =
@@ -92,15 +98,18 @@ g(x) =
     \end{cases}
 \end{equation}
 
-Advantages of ReLU's also include better gradient propagation as well as fast computation.
+Advantages of ReLU's include better gradient propagation as well as fast computation and sparse representation. Some disadvantages include non-differentiability at $x=0$. Also, depending on use case, sparse representation might not be desired.
 
 \subsubsection{Minibatch Training}
 
-Historically,
+Historically, neural networks were trained one example at a time (online) or in a batch (all examples at once). \cite{wilson2003general} For the online approach, the network weights are updated after gradients are calculated and backpropagated for each training example. On the other hand, the batch approach accumulates average gradients for all examples and then updates the network weights. The batch approach might approximate the true gradients better than the online approach, but the online approach tends to have faster training time and convergence. \cite{wilson2003general} This is because with an online approach, the network is less likely to get stuck in a local minimum.
+
+Minibatch training has become more popular recently. Serving as a midway point between the two approaches, minibatch training exposes the network to a small number of examples and then accumulates gradients and updates the network weights. The trend toward minibatch training comes at a time where parallel computing resources are easily accessible.
 
 
 \subsubsection{Batch Normalization}
 
+Batch normalization is a technique that helps to speed up training time and convergence. Batch normalization accumulates learned statistics of the network to help achieve loss convergence more quickly. More formally,
 
 
 % \subsubsection{Neural networks as computational graphs}
