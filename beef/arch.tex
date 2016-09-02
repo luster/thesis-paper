@@ -37,7 +37,17 @@ The choice of $\epsilon$ used in \cite{liu2014experiments} is $10^{-5}$. This mo
 \label{fig:mrelu}
 \end{figure}
 
+Since this network is supervised, we allow the training access to the original magnitude spectra $X[k]$. The loss function for training this network is defined as the mean squared error (MSE) between the network output and the clean spectra $X[k]$:
+
+\begin{equation}
+l(\vec{X},\vec{\hat{X}}) = \norm{\vec{X}-\vec{\hat{X}}}^{2}
+\end{equation}
+
+For our simulations, we also apply batch normalization at the input to help train more quickly and efficiently.
+
 \subsection{Partitioned Autoencoder}
+
+Adopted from \cite{stow}, the partitioned autoencoder is
 
 \subsubsection{Phase Reconstruction}
 

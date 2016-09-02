@@ -7,39 +7,39 @@
 \contentsline {subsubsection}{\numberline {2.1.4}Gradient Stuff?}{4}
 \contentsline {subsection}{\numberline {2.2}Neural Networks}{4}
 \contentsline {subsubsection}{\numberline {2.2.1}Dense Layer}{6}
-\contentsline {subsubsection}{\numberline {2.2.2}Autoencoder}{6}
+\contentsline {subsubsection}{\numberline {2.2.2}Denoising Autoencoder}{6}
 \contentsline {subsubsection}{\numberline {2.2.3}Convolutional Layer}{7}
-\contentsline {subsubsection}{\numberline {2.2.4}Nonlinearity Choice}{7}
-\contentsline {subsubsection}{\numberline {2.2.5}Minibatches}{7}
-\contentsline {subsubsection}{\numberline {2.2.6}Batch Normalization}{7}
-\contentsline {subsubsection}{\numberline {2.2.7}Weight Updates}{7}
-\contentsline {subsection}{\numberline {2.3}Signals and Systems}{7}
-\contentsline {subsubsection}{\numberline {2.3.1}Signals}{7}
-\contentsline {subsubsection}{\numberline {2.3.2}Convolution}{8}
-\contentsline {subsubsection}{\numberline {2.3.3}Frequency Transforms}{9}
-\contentsline {subsubsection}{\numberline {2.3.4}Windowing and Perfect Reconstruction}{10}
-\contentsline {subsubsection}{\numberline {2.3.5}Window Size and Frequency v. Time Resolution Tradeoff}{11}
-\contentsline {subsubsection}{\numberline {2.3.6}Noise and Signal-to-Noise Ratio}{11}
-\contentsline {subsubsection}{\numberline {2.3.7}Magnitude and Phase Spectrum}{11}
-\contentsline {section}{\numberline {3}Signal Model and Data}{12}
-\contentsline {subsection}{\numberline {3.1}Network Input and Output}{12}
-\contentsline {subsection}{\numberline {3.2}Signal and Noise Choices}{14}
-\contentsline {subsection}{\numberline {3.3}Other Network Parameters}{14}
-\contentsline {section}{\numberline {4}De-noising Architectures}{15}
-\contentsline {subsection}{\numberline {4.1}Supervised Autoencoder}{15}
-\contentsline {subsection}{\numberline {4.2}Partitioned Autoencoder}{16}
-\contentsline {subsubsection}{\numberline {4.2.1}Phase Reconstruction}{16}
-\contentsline {subsection}{\numberline {4.3}Curro Autoencoder}{16}
-\contentsline {section}{\numberline {5}Results}{17}
-\contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{17}
-\contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{17}
-\contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{17}
-\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{17}
-\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{17}
-\contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{17}
-\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{17}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{18}
-\contentsline {subsection}{\numberline {6.1}Conclusions}{18}
-\contentsline {subsection}{\numberline {6.2}Future Work}{19}
-\contentsline {subsubsection}{\numberline {6.2.1}Models}{19}
-\contentsline {subsubsection}{\numberline {6.2.2}Data}{20}
+\contentsline {subsubsection}{\numberline {2.2.4}Weight Updates}{7}
+\contentsline {subsubsection}{\numberline {2.2.5}Choice of Activation Function}{7}
+\contentsline {subsubsection}{\numberline {2.2.6}Minibatch Training}{8}
+\contentsline {subsubsection}{\numberline {2.2.7}Batch Normalization}{9}
+\contentsline {subsection}{\numberline {2.3}Signals and Systems}{9}
+\contentsline {subsubsection}{\numberline {2.3.1}Signals}{9}
+\contentsline {subsubsection}{\numberline {2.3.2}Convolution}{10}
+\contentsline {subsubsection}{\numberline {2.3.3}Frequency Transforms}{11}
+\contentsline {subsubsection}{\numberline {2.3.4}Windowing and Perfect Reconstruction}{12}
+\contentsline {subsubsection}{\numberline {2.3.5}Window Size and Frequency v. Time Resolution Tradeoff}{12}
+\contentsline {subsubsection}{\numberline {2.3.6}Noise and Signal-to-Noise Ratio}{13}
+\contentsline {subsubsection}{\numberline {2.3.7}Magnitude and Phase Spectrum}{13}
+\contentsline {section}{\numberline {3}Signal Model and Data}{14}
+\contentsline {subsection}{\numberline {3.1}Network Input and Output}{14}
+\contentsline {subsection}{\numberline {3.2}Signal and Noise Choices}{16}
+\contentsline {subsection}{\numberline {3.3}Other Network Parameters}{16}
+\contentsline {section}{\numberline {4}De-noising Architectures}{17}
+\contentsline {subsection}{\numberline {4.1}Supervised Autoencoder}{17}
+\contentsline {subsection}{\numberline {4.2}Partitioned Autoencoder}{19}
+\contentsline {subsubsection}{\numberline {4.2.1}Phase Reconstruction}{19}
+\contentsline {subsection}{\numberline {4.3}Curro Autoencoder}{19}
+\contentsline {section}{\numberline {5}Results}{20}
+\contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{20}
+\contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{20}
+\contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{20}
+\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{20}
+\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{20}
+\contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{20}
+\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{20}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{21}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{21}
+\contentsline {subsection}{\numberline {6.2}Future Work}{22}
+\contentsline {subsubsection}{\numberline {6.2.1}Models}{22}
+\contentsline {subsubsection}{\numberline {6.2.2}Data}{23}
