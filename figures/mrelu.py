@@ -10,9 +10,9 @@ params = {'legend.fontsize': 6,
           }
 plt.rcParams.update(params)
 
-n = np.linspace(-5, 5, 2000)
+n = np.linspace(-3, 3, 2000)
 eps = 10**-5
-x = eps/(n-1-eps)
+x = -eps/(n-1-eps)
 
 plt.figure(figsize=(4.5,3), dpi=300)
 plt.xlabel('n')
