@@ -121,4 +121,11 @@ W.~W. Cohen, A.~McCallum, and S.~T. Roweis, Eds., \emph{Proceedings of the
   \url{http://deeplearning.net/dA.html}
 \BIBentrySTDinterwordspacing
 
+\bibitem{DBLP:journals/corr/SonodaM16}
+\BIBentryALTinterwordspacing
+S.~Sonoda and N.~Murata, ``Decoding stacked denoising autoencoders,''
+  \emph{CoRR}, vol. abs/1605.02832, 2016. [Online]. Available:
+  \url{http://arxiv.org/abs/1605.02832}
+\BIBentrySTDinterwordspacing
+
 \end{thebibliography}
