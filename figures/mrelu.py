@@ -12,7 +12,7 @@ plt.rcParams.update(params)
 
 n = np.linspace(-1, 1, 2000)
 eps = 10**-5
-x = np.piecewise(n, [n<eps, n>=eps], [-eps/(n-1-eps),n])
+x = np.piecewise(n, [n<eps, n>=eps], [lambda n: -eps/(n-1-eps), lambda n: n])
 
 plt.figure(figsize=(4.5,3), dpi=300)
 plt.xlabel('x')
