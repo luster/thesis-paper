@@ -10,12 +10,12 @@ params = {'legend.fontsize': 6,
           }
 plt.rcParams.update(params)
 
-n = np.linspace(-3, 3, 2000)
+n = np.linspace(-1, 1, 2000)
 eps = 10**-5
-x = -eps/(n-1-eps)
+x = np.piecewise(n, [n<eps, n>=eps], [-eps/(n-1-eps),n])
 
 plt.figure(figsize=(4.5,3), dpi=300)
-plt.xlabel('n')
+plt.xlabel('x')
 plt.ylabel('y')#, rotation=0)
 plt.title('Modified Rectified Linear Activation Function (mReLU)')
 plt.plot(n, x)
