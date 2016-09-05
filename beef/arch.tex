@@ -82,3 +82,18 @@ Other experiments we tried involved trying to explicitly or implicitly estimate 
 
 \subsection{Curro Autoencoder}
 
+We present here the Curro Partitioned Autoencoder, a novel partitioned neural network architecture. Similar to \cite{stow}, we exploit the latent space structure to put noise and signal energy into different latent variables. A basic overview of the network is detailed in Figure [FIG].
+
+In the shallow case, we have an input layer, a fully connected hidden layer, and then a split in the latent space. We split the network such that half of the latent variables correspond to signal and the other half correspond to noise, and then the outputs from both network partitions are summed. For the shallow case, we use one fully connected layer followed by an output layer of the same size. The parallel networks are the same size and share the same parameters $\vec{W}$ and $\vec{b}$. Unlike in \cite{stow}, we constrain the problem to 50\% of latent variables for signal content and 50\% for noise content. While there may be drawbacks to such a restriction, the benefit here is that we do not have to choose that ratio as a hyperparameter.
+
+More formally,
+
+\begin{equation}
+\hat{Y_i}[k] = \hat{X_i}[k] + \hat{N_i}[k]
+\end{equation}
+
+where
+
+\begin{equation}
+\hat{X_i}[k] = \vec{W}^{(3)} f(\vec{W}^{(2)} \vec{z}_{1/2} + \vec{b}^{(2)}) + \vec{b}^{(3)}
+\end{equation}

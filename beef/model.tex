@@ -19,7 +19,7 @@ where $SNR_{lin}$ is given by
 SNR_{lin} = 10^{\frac{SNR_{db}}{10}}
 \end{equation}
 
-In supervised scenarios, we allow the network to train with access to the ground truth $x[n]$. On the other hand, in semi-supervised scenarios, we only allow the network to train with access to a ``soft label'' indicating if the signal is (1) noise-only or (2) noise and possibly signal. [DanStowell] However, in both supervised and semi-supervised scenarios, our neural network input is one of the following:
+In supervised scenarios, we allow the network to train with access to the ground truth $x[n]$. On the other hand, in semi-supervised scenarios, we only allow the network to train with access to a ``soft label'' indicating if the signal is (1) noise-only or (2) noise and possibly signal. \cite{stow} However, in both supervised and semi-supervised scenarios, our neural network input is one of the following:
 
 \begin{enumerate}
     \item Frames of $y[n]$
@@ -38,10 +38,15 @@ We choose the frame length $L$, time-domain window $w[n]$, and frame overlap per
 Similary, our time resolution is given by
 
 \begin{equation}
-\dfrac{N}{fs} = 64 \:\text{msec} 
+\dfrac{N}{fs} = 64 \:\text{msec}
 \end{equation}
 
-Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames. (Anything to add about phase denoising and failures here?)
+Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
+
+\begin{equation}
+\hat{x[n]} = \mathscr{F}^{-1} \{ \norm{\hat{X}[k]} e^{j \angle{Y[k]}} \}
+\end{equation}
+%(Anything to add about phase denoising and failures here?)
 
 \subsection{Signal and Noise Choices}
 Our choice of signals include the following:

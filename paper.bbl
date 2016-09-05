@@ -45,6 +45,10 @@ D.~R. Wilson and T.~R. Martinez, ``The general inefficiency of batch training
   for gradient descent learning,'' \emph{Neural Networks}, vol.~16, no.~10, pp.
   1429--1451, 2003.
 
+\bibitem{alan1989discrete}
+V.~O. Alan, W.~S. Ronald, and R.~John, ``Discrete-time signal processing,''
+  \emph{New Jersey, Printice Hall Inc}, 1989.
+
 \bibitem{baldi2012complex}
 P.~Baldi and Z.~Lu, ``Complex-valued autoencoders,'' \emph{Neural Networks},
   vol.~33, pp. 136--147, 2012.
@@ -64,10 +68,6 @@ P.~Vincent, H.~Larochelle, I.~Lajoie, Y.~Bengio, and P.-A. Manzagol, ``Stacked
 T.~Ishii, H.~Komiyama, T.~Shinozaki, Y.~Horiuchi, and S.~Kuroiwa, ``Reverberant
   speech recognition based on denoising autoencoder.'' in \emph{INTERSPEECH},
   2013, pp. 3512--3516.
-
-\bibitem{alan1989discrete}
-V.~O. Alan, W.~S. Ronald, and R.~John, ``Discrete-time signal processing,''
-  \emph{New Jersey, Printice Hall Inc}, 1989.
 
 \bibitem{gold2011speech}
 B.~Gold, N.~Morgan, and D.~Ellis, ``Speech and audio signal processing:
