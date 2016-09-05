@@ -45,6 +45,11 @@ D.~R. Wilson and T.~R. Martinez, ``The general inefficiency of batch training
   for gradient descent learning,'' \emph{Neural Networks}, vol.~16, no.~10, pp.
   1429--1451, 2003.
 
+\bibitem{ioffe2015batch}
+S.~Ioffe and C.~Szegedy, ``Batch normalization: Accelerating deep network
+  training by reducing internal covariate shift,'' \emph{arXiv preprint
+  arXiv:1502.03167}, 2015.
+
 \bibitem{alan1989discrete}
 V.~O. Alan, W.~S. Ronald, and R.~John, ``Discrete-time signal processing,''
   \emph{New Jersey, Printice Hall Inc}, 1989.
@@ -106,11 +111,6 @@ S.~Dieleman, J.~Schlüter, C.~Raffel, E.~Olson, S.~K. Sønderby, D.~Nouri,
   D.~K. Rasul, CongLiu, Britefury, and J.~Degrave, ``Lasagne: First release.''
   Aug. 2015. [Online]. Available: \url{http://dx.doi.org/10.5281/zenodo.27878}
 \BIBentrySTDinterwordspacing
-
-\bibitem{ioffe2015batch}
-S.~Ioffe and C.~Szegedy, ``Batch normalization: Accelerating deep network
-  training by reducing internal covariate shift,'' \emph{arXiv preprint
-  arXiv:1502.03167}, 2015.
 
 \bibitem{VincentPLarochelleH2008}
 P.~Vincent, H.~Larochelle, Y.~Bengio, and P.-A. Manzagol, ``Extracting and
