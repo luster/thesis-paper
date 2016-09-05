@@ -94,6 +94,41 @@ More formally,
 
 where
 
+\begin{align}
+\hat{X_i}[k] &= \vec{W}^{(3)} f(\vec{W}^{(2)} \vec{z}_{i,sig} + \vec{b}^{(2)}) + \vec{b}^{(3)}\\
+\hat{N_i}[k] &= \vec{W}^{(3)} f(\vec{W}^{(2)} \vec{z}_{i,noi} + \vec{b}^{(2)}) + \vec{b}^{(3)}
+\end{align}
+
+and the partitioned latent space $\vec{z_i}$ is given by
+
 \begin{equation}
-\hat{X_i}[k] = \vec{W}^{(3)} f(\vec{W}^{(2)} \vec{z}_{1/2} + \vec{b}^{(2)}) + \vec{b}^{(3)}
+\vec{z}_i = f(\vec{W}^{(1)} f(\vec{W}^{(0)} \vec{Y}_{i}[k] + b^{(0)}) + b^{(1)})
 \end{equation}
+
+with associated partitions
+
+\begin{equation}
+\vec{z_i} =
+    \left[
+    \begin{array}{c}
+        \vec{z}_{i,sig} \\
+        \hline
+        \vec{z}_{i,noi}
+    \end{array}
+    \right]
+\end{equation}
+
+Note that for a latent space $\vec{z}$ with $N$ dimensions, the latent partitions $\vec{z}_{i,sig}$ and $\vec{z}_{i,noi}$ have dimension $N/2$.
+
+We train the network as in \cite{stow} with minibatches consisting of noise-only examples and signal-plus-noise examples. The way we train the network to learn the partitions uses the following loss function:
+
+\begin{equation}
+l(\vec{Y}, \vec{\hat{X}}) =
+    \begin{cases}
+        \hfill \norm{\vec{Y}-\vec{\hat{N}}}^{2} \hfill & \text{if $\vec{Y}$ is noise-only}\\
+        \hfill \norm{\vec{Y}-\vec{\hat{Y}}}^{2} & \text{if $\vec{Y}$ is signal-plus-noise}
+    \end{cases}
+\end{equation}
+%For the results presented in the next section, we use magnitude spectrum frames as network input. e
+
+We introduce
