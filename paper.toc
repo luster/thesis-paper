@@ -31,16 +31,16 @@
 \contentsline {subsection}{\numberline {4.2}Partitioned Autoencoder}{21}
 \contentsline {subsubsection}{\numberline {4.2.1}Phase Reconstruction}{23}
 \contentsline {subsection}{\numberline {4.3}Curro Autoencoder}{24}
-\contentsline {section}{\numberline {5}Results}{26}
-\contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{26}
-\contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{26}
-\contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{26}
-\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{26}
-\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{26}
-\contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{26}
-\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{26}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{27}
-\contentsline {subsection}{\numberline {6.1}Conclusions}{27}
-\contentsline {subsection}{\numberline {6.2}Future Work}{28}
-\contentsline {subsubsection}{\numberline {6.2.1}Models}{28}
-\contentsline {subsubsection}{\numberline {6.2.2}Data}{29}
+\contentsline {section}{\numberline {5}Results}{27}
+\contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{27}
+\contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{27}
+\contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{27}
+\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{27}
+\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{27}
+\contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{27}
+\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{27}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{28}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{28}
+\contentsline {subsection}{\numberline {6.2}Future Work}{29}
+\contentsline {subsubsection}{\numberline {6.2.1}Models}{29}
+\contentsline {subsubsection}{\numberline {6.2.2}Data}{30}

@@ -131,4 +131,16 @@ l(\vec{Y}, \vec{\hat{X}}) =
 \end{equation}
 %For the results presented in the next section, we use magnitude spectrum frames as network input. e
 
-We introduce
+We introduce again a soft label $y$ indicating if the example is noise-only or signal-plus-noise. We can then rewrite our loss function as
+
+\begin{align}
+l(\vec{Y}, \vec{\hat{X}}) &= \text{MSE} (\vec{Y}, y\vec{\hat{X}}+\vec{\hat{Y}})\\
+&= \norm{ \vec{Y} - y\vec{\hat{X}}-\vec{\hat{Y}} }^{2}
+\end{align}
+
+In this case, the soft label $y$ takes on the opposite values as in \cite{stow}, i.e. $y=0$ for noise-only examples and $y=1$ for signal-plus-noise examples.
+
+This network also has the benefit of being able to reconstruct both the noise and the signal independently. At inference time, the desired signal can be obtained by only reconstructing the top half of the network. Also, in the case of introduced distortion, a proportion of the signal half and noise half can be combined at different ratios, i.e. $\vec{\hat{X}}+\alpha \vec{\hat{N}}$. Depending on circumstances, this can be introduced as a learned parameter or can be tuned manually or through a grid search.
+
+% Any more to say on the Curro net??
+
