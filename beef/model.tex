@@ -9,7 +9,7 @@ y[n] = x[n] + N[n]
 
 To achieve a particular average SNR per simulation, we take the average signal energy for each minibatch of size $B$ to determine a multiplicative scale factor $k$ on the noise signal $N[n]$. For example, for additive white Gaussian noise (AWGN), we sample from the zero-mean, unit variance normal distribution (``randn'' in Python) and determine our scale factor $k$ as $\sigma$ using the specified SNR in decibels:
 
-\begin{equation}
+\begin{equation}\label{eq:siggy}
 \sigma_n^{2} = \dfrac{1}{SNR_{lin}}\dfrac{1}{BN}\sum_{b=0}^{B-1} \sum_{n=0}^{N-1} x_{b}^{2}[n]
 \end{equation}
 

@@ -1,6 +1,30 @@
+We present results here for mainly shallow network architectures. At the output layer of each network, an identity nonlinearity is used. At any other layer, the modified ReLU (mReLU) is used. Unless otherwise noted, batch normalization is applied at the input layer. Each network is compared first to itself at varying noise levels (-6 dB, -3 dB, 0 dB, 3 dB, 6 dB SNR) in terms of convergence as well as the mean squared error (MSE) for inferences.
+
+Training minibatches consist of 128 examples, each with 1024-sample FFT frames of $\norm{Y[k]}$ at a sampling rate 16 kHz. Time windows are windowed using the Hanning window, and we use 50\% overlap for perfect reconstruction at inference time. The examples used are a sum of sine waves at four fixed frequencies with uniform random amplitude and phase. The frequencies are chosen to form an A4 major chord (1-3-5-8) at slightly de-tuned frequencies so as not to allow the network to learn any pattern from the immediate harmonic structure.
+
+\begin{align}
+f &= [441, 549, 660, 881]\qquad \text{Hz}\\
+x[n] &= \sum_{i=0}^{3} A_i \sin{2 \pi f_i / f_s n + \phi_i}, \qquad n=0\ldots ,1023\\
+A_i &\sim U(0.25, 0.75)\\
+\phi &\sim U(0, 2\pi)
+\end{align}
+
+Applied noise is additive-white Gaussian noise (AWGN), with the variance $\sigma^2$ selected to achieve the desired average SNR for each minibatch as in Equation \ref{eq:siggy}.
+
+\begin{align}
+N[n] &\sim N(0, \sigma^2), \qquad n=0\ldots ,1023\\
+y[n] &= x[n] + N[n]
+\end{align}
+
+In semi-supervised cases where we use the soft label $y$ for noise-only versus signal-plus-noise examples, we use 25\% noise-only examples per minibatch. For inference calculations, we construct a minibatch with consecutive overlapping, windowed frames.
+
+Simulations are written in Python 2.7 using Lasasgne \cite{sander_dieleman_2015_27878}, a ``lightweight library to build and train neural networks in Theano.'' Theano is a ``Python library that allows you to define, optimize, and evaluate mathematical expressions involving multi-dimensional arrays efficiently.'' \cite{2016arXiv160502688short} Theano boasts parallel GPU support, numpy support (a mathematical Python library), numerical stability, and symbolic differentiation, among other features. These libraries and frameworks allow for ease of developing deep, novel architectures and save time in doing things like calculating gradients, weight updates and back-propagation. Sample simulation code is shown in the Appendix.
+
+Weight updates are calculated using Adam updates \cite{DBLP:journals/corr/KingmaB14}. 2000 iterations (minibatches) are used for each simulation. Unless otherwise noted, each hidden layer uses 2000 hidden nodes.
+
 \subsection{Supervised Autoencoder}
 
-For the following results, we show 
+For the following results, we show
 
 \subsubsection{Batch Normalized Input}
 

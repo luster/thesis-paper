@@ -54,6 +54,29 @@ S.~Ioffe and C.~Szegedy, ``Batch normalization: Accelerating deep network
 V.~O. Alan, W.~S. Ronald, and R.~John, ``Discrete-time signal processing,''
   \emph{New Jersey, Printice Hall Inc}, 1989.
 
+\bibitem{sander_dieleman_2015_27878}
+\BIBentryALTinterwordspacing
+S.~Dieleman, J.~Schlüter, C.~Raffel, E.~Olson, S.~K. Sønderby, D.~Nouri,
+  D.~Maturana, M.~Thoma, E.~Battenberg, J.~Kelly, J.~D. Fauw, M.~Heilman,
+  diogo149, B.~McFee, H.~Weideman, takacsg84, peterderivaz, Jon, instagibbs,
+  D.~K. Rasul, CongLiu, Britefury, and J.~Degrave, ``Lasagne: First release.''
+  Aug. 2015. [Online]. Available: \url{http://dx.doi.org/10.5281/zenodo.27878}
+\BIBentrySTDinterwordspacing
+
+\bibitem{2016arXiv160502688short}
+\BIBentryALTinterwordspacing
+{Theano Development Team}, ``{Theano: A {Python} framework for fast computation
+  of mathematical expressions},'' \emph{arXiv e-prints}, vol. abs/1605.02688,
+  May 2016. [Online]. Available: \url{http://arxiv.org/abs/1605.02688}
+\BIBentrySTDinterwordspacing
+
+\bibitem{DBLP:journals/corr/KingmaB14}
+\BIBentryALTinterwordspacing
+D.~P. Kingma and J.~Ba, ``Adam: {A} method for stochastic optimization,''
+  \emph{CoRR}, vol. abs/1412.6980, 2014. [Online]. Available:
+  \url{http://arxiv.org/abs/1412.6980}
+\BIBentrySTDinterwordspacing
+
 \bibitem{baldi2012complex}
 P.~Baldi and Z.~Lu, ``Complex-valued autoencoders,'' \emph{Neural Networks},
   vol.~33, pp. 136--147, 2012.
@@ -95,22 +118,6 @@ G.~E. Hinton and R.~R. Salakhutdinov, ``Reducing the dimensionality of data
 A.~Rad and T.~Virtanen, ``Phase spectrum prediction of audio signals,'' in
   \emph{International Symposium on Communications Control and Signal Processing
   (ISCCSP)}, 2012, pp. 1--5.
-
-\bibitem{2016arXiv160502688short}
-\BIBentryALTinterwordspacing
-{Theano Development Team}, ``{Theano: A {Python} framework for fast computation
-  of mathematical expressions},'' \emph{arXiv e-prints}, vol. abs/1605.02688,
-  May 2016. [Online]. Available: \url{http://arxiv.org/abs/1605.02688}
-\BIBentrySTDinterwordspacing
-
-\bibitem{sander_dieleman_2015_27878}
-\BIBentryALTinterwordspacing
-S.~Dieleman, J.~Schlüter, C.~Raffel, E.~Olson, S.~K. Sønderby, D.~Nouri,
-  D.~Maturana, M.~Thoma, E.~Battenberg, J.~Kelly, J.~D. Fauw, M.~Heilman,
-  diogo149, B.~McFee, H.~Weideman, takacsg84, peterderivaz, Jon, instagibbs,
-  D.~K. Rasul, CongLiu, Britefury, and J.~Degrave, ``Lasagne: First release.''
-  Aug. 2015. [Online]. Available: \url{http://dx.doi.org/10.5281/zenodo.27878}
-\BIBentrySTDinterwordspacing
 
 \bibitem{VincentPLarochelleH2008}
 P.~Vincent, H.~Larochelle, Y.~Bengio, and P.-A. Manzagol, ``Extracting and

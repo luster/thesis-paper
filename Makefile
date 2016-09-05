@@ -1,5 +1,5 @@
 all:
-	xelatex paper.tex
+	xelatex -shell-escape paper.tex
 	bibtex paper
-	xelatex paper.tex
-	xelatex paper.tex
+	xelatex -shell-escape paper.tex
+	xelatex -shell-escape paper.tex

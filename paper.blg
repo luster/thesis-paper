@@ -15,45 +15,45 @@ Warning--empty journal in kayserdenoising
 Warning--empty year in kayserdenoising
 
 Done.
-You've used 22 entries,
+You've used 23 entries,
             4087 wiz_defined-function locations,
-            944 strings with 10983 characters,
-and the built_in function-call counts, 14970 in all, are:
-= -- 1154
-> -- 409
-< -- 100
-+ -- 214
-- -- 78
-* -- 711
-:= -- 2260
-add.period$ -- 44
-call.type$ -- 22
-change.case$ -- 23
+            950 strings with 11157 characters,
+and the built_in function-call counts, 15449 in all, are:
+= -- 1198
+> -- 418
+< -- 101
++ -- 218
+- -- 80
+* -- 736
+:= -- 2355
+add.period$ -- 46
+call.type$ -- 23
+change.case$ -- 24
 chr.to.int$ -- 228
-cite$ -- 24
-duplicate$ -- 1091
-empty$ -- 1248
-format.name$ -- 97
-if$ -- 3463
+cite$ -- 25
+duplicate$ -- 1130
+empty$ -- 1286
+format.name$ -- 100
+if$ -- 3567
 int.to.chr$ -- 0
-int.to.str$ -- 22
-missing$ -- 208
-newline$ -- 99
-num.names$ -- 24
-pop$ -- 529
+int.to.str$ -- 23
+missing$ -- 215
+newline$ -- 104
+num.names$ -- 25
+pop$ -- 544
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 1158
+skip$ -- 1197
 stack$ -- 0
-substring$ -- 556
-swap$ -- 840
-text.length$ -- 24
+substring$ -- 557
+swap$ -- 865
+text.length$ -- 25
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 22
+type$ -- 23
 warning$ -- 2
-while$ -- 59
-width$ -- 24
-write$ -- 229
+while$ -- 60
+width$ -- 25
+write$ -- 241
 (There were 2 warnings)

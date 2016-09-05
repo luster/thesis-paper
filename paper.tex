@@ -12,6 +12,8 @@
 \usepackage{cite}
 \usepackage{ mathrsfs }
 \usepackage{booktabs}
+\usepackage{listings}
+\usepackage{minted}
 \usepackage{tikz}
 \usepackage{caption}
 
@@ -135,8 +137,12 @@ the requirements for the degree of Master of Engineering.
 {\Large Abstract} \\
 
 \vspace{1in}
-\input{abstract}
 \end{center}
+{
+    \fontsize{12pt}{24pt}\selectfont
+    \input{abstract}
+}
+
 
 
 \newpage
@@ -188,10 +194,21 @@ Table of Nomenclature
 \input{conc}
 
 \newpage
-
+\raggedright
 \nocite{*}
 \fontsize{12pt}{16pt}\selectfont
 \bibliography{bib}{}
 \bibliographystyle{IEEEtran}
 
+\eject
+\appendix
+\section{Simulation Code}
+\fontsize{12pt}{24pt}\selectfont
+
+\justify
+The following code samples show how network architectures were constructed, how GPU functions were compiled, how networks were trained, and how simulation results were collected and plotted.
+
+\begin{center}
+\inputminted[linenos=true]{python}{../thesis/thesis/comparisons/autoencoder.py}
+\end{center}
 \end{document}

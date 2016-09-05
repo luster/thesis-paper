@@ -44,17 +44,17 @@ Described in the previous section, we refer to a dense layer as a fully connecte
 
 An autoencoder is normally an abstraction of neural networks in which an encode function $\vec{Z}=f(\vec{X})$ and a decode function $\hat{\vec{X}}=g(\vec{Z})$ are learned to learn a lower-dimensional representation of some input $\vec{X}$. \cite{stow} A denoising autoencoder is a supervised process whereby the clean input is first corrupted by some stochastic process $\vec{Y}=u(\vec{X})$. In other words, the neural network input would be a noisy input $Y$, and the network would try to learn weights such that the network output $\vec{\hat{X}}$ approximates the clean input $\vec{X}$. Another way to frame it is that your network is learning the inverse function of the noise process $u(\vec{x})$.
 
-\subsubsection{Convolutional Layer}
+% \subsubsection{Convolutional Layer}
 
 
 
 \subsubsection{Network Training}
 
-In order to train a neural network, we must update the weights such that we minimize a loss function, often some kind of sum-of-square error function. \cite{bishop}
+In order to train a neural network, we must update the weights such that we minimize a loss function, often some kind of sum-of-square error function. \cite{bishop} Often, a stochastic gradient descent (SGD) approach is taken to determine the weights that minimize the loss function.
 
 
 
-\subsubsection{Regularization}
+% \subsubsection{Regularization}
 
 
 
