@@ -22,51 +22,67 @@ Simulations are written in Python 2.7 using Lasasgne \cite{sander_dieleman_2015_
 
 Weight updates are calculated using Adam updates \cite{DBLP:journals/corr/KingmaB14}. 2000 iterations (minibatches) are used for each simulation. Unless otherwise noted, each hidden layer uses 2000 hidden nodes.
 
+Loss-based plots show the loss function convergence during training iterations, where the l. Mean squared error plots show the MSE every 50 training examples for an inference example that does not change.
+
 \subsection{Supervised Autoencoder}
 
-For the following results, we show
+The following results show a single-layer autoencoder with and without batch normalization at the input layer.
 
 \subsubsection{Batch Normalized Input}
+
+In Figure \ref{fig:paris-bn-loss}, we can see that the loss function appears to converge at or before 2000 iterations. As expected, as SNR increases, the loss objective converges to a lower value. Since this network is trained using only the squared error loss, this should be expected. Note that as the SNR increases, the difference in the converged value gets smaller. Also interesting is the fact that lower SNR plots converge more quickly but to higher values. This suggests that the network does not respond well to too much noise.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-loss}
-\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
+\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}\label{fig:paris-bn-loss}
 \end{figure}
+
+In Figure \ref{fig:paris-bn-mse}, we can see that the MSE generally goes down as SNR goes up. This should be expected, though perhaps there may be an error in the simulation since the lines blur a bit between -3 dB and 6 dB.
+
+Also, the saved audio from which the MSE's were calculated have some distortion introduced from the network.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-mse}
-\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
+\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}\label{fig:paris-bn-mse}
 \end{figure}
 
 \subsubsection{Non-Batch Normalized Input}
 
+As expected, in Figure \ref{fig:paris-loss}, the loss metric converges about the same as for the batch normalized case. As expected, the convergence time in terms of number of iterations is slightly higher. One interesting section is how the 6 dB curve converges. It appears to have a strong section of downward concavity. It is possible that this occurred randomly, as the random number generator in Numpy was set to a random seed. It is also possible that because of an absence of batch normalization, some neurons saturated and did not change substantially for some time.
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-loss}
-\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input}
+\caption{Loss at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input}\label{fig:paris-loss}
 \end{figure}
+
+Somewhat unexpectedly, the MSE in Figure \ref{fig:paris-mse} converges to a lower value than that of Figure \ref{fig:paris-bn-mse}. This suggests that there may be an error in the simulation, likely in using the stored statistics for batch normalization as opposed to using an on-the-fly calculation of the minibatch statistics at inference time. However, we still achieve convergence here which is expected. Past 0 dB, the MSE seems to converge to a similar value, suggesting that the network has diminishing returns for higher SNR.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-mse}
-\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input}
+\caption{MSE at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input}\label{fig:paris-mse}
 \end{figure}
 
 
 \subsection{Partitioned Autoencoder}
 
+
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss}
 \caption{Loss at various SNRs for Single-Layer Partitioned Autoencoder\cite{stow}}
+\label{fig:dan-loss}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse}
 \caption{MSE at various SNRs for Single-Layer Partitioned Autoencoder\cite{stow}}
+\label{fig:dan-mse}
 \end{figure}
 
 \subsection{Partitioned Curro Autoencoder}

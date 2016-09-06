@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  5 SEP 2016 18:46
+This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  5 SEP 2016 20:19
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1257,19 +1257,23 @@ File: figures/mrelu.pdf Graphic file (type QTm)
  <use  "figures/mrelu.pdf" > [20] [21]
 File: figures/cmat.png Graphic file (type QTm)
 
-<use  "figures/cmat.png" > [22] [23] [24] [25]) [26] (./results/main.tex
-[27]
+<use  "figures/cmat.png" > [22] [23]
+File: figures/currodiagram.png Graphic file (type QTm)
+ <use  "figures/currodiagram.png" >
+[24] [25]) [26] (./results/main.tex [27] [28]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf Graphic file (t
 ype QTm)
- <use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf" >
+
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf" >
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf Graphic file (ty
 pe QTm)
 
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf" >
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf" > [29]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-loss.pdf Gra
 phic file (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-loss.pdf" >
+[30]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-mse.pdf Grap
 hic file (type QTm)
 
@@ -1278,14 +1282,14 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss.pdf Graphic fil
 e (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss.pdf" >
-[28]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf Graphic file
  (type QTm)
- <use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf" >
+
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf" >
 File: ../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf Graphic file (t
 ype QTm)
 
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf" >
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf" > [31]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/curro-mse.pdf Graphic file (ty
 pe QTm)
 
@@ -1330,14 +1334,7 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf Graphic f
 ile (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf" >)
-Overfull \vbox (51.20851pt too high) has occurred while \output is active []
-
-
-[29] (./conc.tex
-Overfull \vbox (10.01402pt too high) has occurred while \output is active []
-
-
-[30]) [31] [32] (./paper.bbl [33] [34] [35] [36] [37]) [38]
+[32] (./conc.tex [33]) [34] [35] (./paper.bbl [36] [37] [38] [39]) [40]
 \openout5 = `paper.mintedcmd'.
 
 runsystem(python -c "import hashlib; hasher = hashlib.sha1(); f = open(\"paper.
@@ -1347,13 +1344,14 @@ thesis/comparisons/autoencoder.py\", \"rb\"); hasher.update(f.read()); f.close(
 123) + hasher.hexdigest() + chr(125) + \"\"; f.write(\"\\makeatletter\" + macro
  + \"\\makeatother\\endinput\n \"); f.close();")...executed.
 
- (./paper.mintedmd5) (./_minted-paper/19d5ebfce0e0a4104e3babe49a7d6ea52b08b778.
-pygtex
+
+(./paper.mintedmd5)
+(./_minted-paper/19d5ebfce0e0a4104e3babe49a7d6ea52b08b778.pygtex
 LaTeX Font Info:    Font shape `EU1/lmtt/bx/n' in size <12> not available
 (Font)              Font shape `EU1/lmtt/b/n' tried instead on input line 2.
- [39] [40]
-[41] [42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55]
-[56] [57] [58] [59] [60] [61] [62])
+ [41] [42]
+[43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57]
+[58] [59] [60] [61] [62] [63] [64])
 runsystem(rm "paper.mintedcmd")...executed.
 
 runsystem(rm "paper.mintedmd5")...executed.
@@ -1363,14 +1361,14 @@ runsystem(rm "paper.mintedmd5")...executed.
 Package caption Warning: Unused \captionsetup[table] on input line 26.
 See the caption package documentation for explanation.
 
-[63] (./paper.aux) ) 
+[65] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 32161 strings out of 493591
- 644347 string characters out of 6143546
- 651731 words of memory out of 5000000
- 35020 multiletter control sequences out of 15000+600000
+ 32170 strings out of 493591
+ 644500 string characters out of 6143546
+ 649795 words of memory out of 5000000
+ 35028 multiletter control sequences out of 15000+600000
  13403 words of font info for 75 fonts, out of 8000000 for 9000
  1347 hyphenation exceptions out of 8191
  55i,12n,69p,10364b,389s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.pdf (71 pages).
+Output written on paper.pdf (73 pages).
