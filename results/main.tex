@@ -69,7 +69,7 @@ Somewhat unexpectedly, the MSE in Figure \ref{fig:paris-mse} converges to a lowe
 
 \subsection{Partitioned Autoencoder}
 
-
+For the dense partitioned autoencoder, the loss function appears to converge although at a slower rate in Figure \ref{fig:dan-loss}. A rerun might use more than 2000 iterations. The loss function also converges to a higher magnitude value since the network is not supervised as well as the large regularization coefficients in the loss function.
 
 \begin{figure}[!ht]
 \centering
@@ -77,6 +77,8 @@ Somewhat unexpectedly, the MSE in Figure \ref{fig:paris-mse} converges to a lowe
 \caption{Loss at various SNRs for Single-Layer Partitioned Autoencoder\cite{stow}}
 \label{fig:dan-loss}
 \end{figure}
+
+The MSE is surprisingly low in Figure \ref{fig:dan-mse}. Unlike in the supervised case, the MSE seems to spread out more as SNR increases. Even at 0 dB, the network seems to learn the noise to some success. A listening test indicates noticeably lower noise level with minimal introduced distortion.
 
 \begin{figure}[!ht]
 \centering
@@ -86,6 +88,8 @@ Somewhat unexpectedly, the MSE in Figure \ref{fig:paris-mse} converges to a lowe
 \end{figure}
 
 \subsection{Partitioned Curro Autoencoder}
+
+
 
 \begin{figure}[!ht]
 \centering
