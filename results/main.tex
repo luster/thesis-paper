@@ -89,18 +89,26 @@ The MSE is surprisingly low in Figure \ref{fig:dan-mse}. Unlike in the supervise
 
 \subsection{Partitioned Curro Autoencoder}
 
+For the Curro Autoencoder simulation, we used 2 dense layers of size 2048 each before partitioning into two 1024 networks. After the partition, we used two dense layers and an output layer for both partitions, all at size 1024.
 
+Interesting to note for the Curro Autoencoder is the fact that it converges almost as quickly across SNR, which can be seen in Figure \ref{fig:curro-loss}. This suggests that the network might have a lesser dependence on SNR than for the other networks. In terms of making the extension to a real-time system, this suggests that the Curro network outperforms the Dense Partitioned Autoencoder. On the other hand, this could suggest that the network quickly gets stuck in a local minimum and fails to reach lower convergence.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/curro-loss}
-\caption{Loss at various SNRs for Single-Layer Curro Autoencoder}
+\caption{Loss at various SNRs for Single-Layer Curro Autoencoder}\label{fig:curro-loss}
 \end{figure}
+
+In Figure \ref{fig:curro-mse}, for -6 dB, the time-domain MSE seems to go up slightly after 50-100 iterations, suggesting that either the loss function or the reconstruction could be incorrect. As expected, the network performs better for higher SNR but still seems to get diminishing returns for SNRs greater than 0 dB.
+
+The plot shows the MSE for reconstruction using only the signal half of the network, i.e. the top half. Interestingly, a listening test indicates that summing the two partitions at the output seems to produce a lower noise volume and lower distortion than for either partition individually. This suggests that the network might not be properly partitioning. It is currently unclear as to whether or not this is the result of a bug in the code or a fundamental flaw in the network architecture. Since this network does not have additional dense layers at the summed output, it could be that the network needs to be deeper.
+
+Another theory is that the underlying symmetry in the FFT is causing the network to effectively initialize to two parallel networks. This could be mitigated by only using the first half of the FFT. Also, adding batch normalization to the rest of the layers might result in better convergence and performance.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/curro-mse}
-\caption{MSE at various SNRs for Single-Layer Curro Autoencoder}
+\caption{MSE at various SNRs for Single-Layer Curro Autoencoder}\label{fig:curro-mse}
 \end{figure}
 
 \subsection{Comparison of Loss Convergence}
