@@ -113,67 +113,77 @@ Another theory is that the underlying symmetry in the FFT is causing the network
 
 \subsection{Comparison of Loss Convergence}
 
+Since our networks have differing loss functions, it doesn't make sense to compare the converged value. Rather, we would like to compare the networks for convergence time in terms of number of iterations, i.e. number of minibatches exposed to the network. From previous figures, we should expect that the SNR might have some difference depending on the network.
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss--6}
-\caption{Loss Comparison of Various Networks at -6 dB}
+\caption{Loss Comparison of Various Networks at -6 dB}\label{fig:comp-loss--6}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss--3}
-\caption{Loss Comparison of Various Networks at -3 dB}
+\caption{Loss Comparison of Various Networks at -3 dB}\label{fig:comp-loss--3}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-0}
-\caption{Loss Comparison of Various Networks at 0 dB}
+\caption{Loss Comparison of Various Networks at 0 dB}\label{fig:comp-loss-0}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-3}
-\caption{Loss Comparison of Various Networks at 3 dB}
+\caption{Loss Comparison of Various Networks at 3 dB}\label{fig:comp-loss-3}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-6}
-\caption{Loss Comparison of Various Networks at 6 dB}
+\caption{Loss Comparison of Various Networks at 6 dB}\label{fig:comp-loss-6}
 \end{figure}
 
+In Figures \cref{fig:comp-loss--6,fig:comp-loss--3,fig:comp-loss-0,fig:comp-loss-3,fig:comp-loss-6}, the Curro Autoencoder seems to converge the quickest, followed by the two supervised networks, then the Dense Partitioned Autoencoder converging the slowest. As expected, as SNR goes up, the supervised networks converge slower while the semi-supervised networks seem to not be as effected by SNR.
 
 
 \subsection{Comparison of Mean Squared Error Convergence}
 
+In terms of MSE convergence, we can safely compare both the convergence time and the value of convergence since the reconstruction is based on the same inference example.
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--6}
-\caption{MSE Comparison of Networks at -6 dB}
+\caption{MSE Comparison of Networks at -6 dB}\label{fig:comp-mse--6}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--3}
-\caption{MSE Comparison of Networks at -3 dB}
+\caption{MSE Comparison of Networks at -3 dB}\label{fig:comp-mse--3}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-0}
-\caption{MSE Comparison of Networks at 0 dB}
+\caption{MSE Comparison of Networks at 0 dB}\label{fig:comp-mse-0}
 \end{figure}
+
+In Figures \cref{fig:comp-mse--6,fig:comp-mse--3,fig:comp-mse-0}, we see that at low SNR the Dense Partitioned Autoencoder usually has the highest MSE. We expect the supervised autoencoders to have lower MSE, which is the case for these figures. However, the Curro Autoencoder has better performance than the supervised systems which is somewhat unexpected. We should expect that the network which has access to the ground truth during training should converge to a lower MSE. The side effect could be a simulation error, like a bug in the code.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-3}
-\caption{MSE Comparison of Networks at 3 dB}
+\caption{MSE Comparison of Networks at 3 dB}\label{fig:comp-mse-3}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.8\textwidth]{../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6}
-\caption{MSE Comparison of Networks at 6 dB}
+\caption{MSE Comparison of Networks at 6 dB}\label{fig:comp-mse-6}
 \end{figure}
 
+Also interesting to note is that for higher SNR, the Partitioned Dense Autoencoder outperforms both supervised methods. This can be seen in Figures \cref{fig:comp-mse-3,fig:comp-mse-6}. If the results are correct, this suggests that a semi-supervised network can outperform a supervised network. This might be the result of enforcing a structure of the latent space, whereas normally differences in initialization of parameters can cause vastly different latent representations.
+
+Also interesting is the fact that for the highest SNR 6 dB, the Partitioned Dense Autoencoder outperforms the Curro Autoencoder. This can be seen in Figure \ref{fig:comp-mse-6}. Again, this could be the result of a simulation error or it could suggest that the Dense Partitioned Autoencoder performs well at high SNR.

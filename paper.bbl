@@ -77,6 +77,18 @@ D.~P. Kingma and J.~Ba, ``Adam: {A} method for stochastic optimization,''
   \url{http://arxiv.org/abs/1412.6980}
 \BIBentrySTDinterwordspacing
 
+\bibitem{kayserdenoising}
+M.~Kayser and V.~Zhong, ``Denoising convolutional autoencoders for noisy speech
+  recognition.''
+
+\bibitem{graves2014towards}
+A.~Graves and N.~Jaitly, ``Towards end-to-end speech recognition with recurrent
+  neural networks.'' in \emph{ICML}, vol.~14, 2014, pp. 1764--1772.
+
+\bibitem{2016arXiv160706450L}
+J.~{Lei Ba}, J.~R. {Kiros}, and G.~E. {Hinton}, ``{Layer Normalization},''
+  \emph{ArXiv e-prints}, Jul. 2016.
+
 \bibitem{baldi2012complex}
 P.~Baldi and Z.~Lu, ``Complex-valued autoencoders,'' \emph{Neural Networks},
   vol.~33, pp. 136--147, 2012.
@@ -100,10 +112,6 @@ T.~Ishii, H.~Komiyama, T.~Shinozaki, Y.~Horiuchi, and S.~Kuroiwa, ``Reverberant
 \bibitem{gold2011speech}
 B.~Gold, N.~Morgan, and D.~Ellis, ``Speech and audio signal processing:
   processing and perception of speech and music,'' 2011.
-
-\bibitem{kayserdenoising}
-M.~Kayser and V.~Zhong, ``Denoising convolutional autoencoders for noisy speech
-  recognition.''
 
 \bibitem{zolzer2008digital}
 U.~Z{\"o}lzer, \emph{Digital audio signal processing}.\hskip 1em plus 0.5em

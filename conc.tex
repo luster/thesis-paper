@@ -1,9 +1,15 @@
 \subsection{Conclusions}
-While more work is needed, deep partitioned neural network architectures using time and frequency data seem promising in long-term solutions for denoising speech and music signals.
+Deep partitioned neural network architectures using time and frequency input data seem promising in long-term solutions for denoising speech and music signals. Future work is detailed in the next section.
 
 \subsection{Future Work}
 \subsubsection{Models}
-Make network deeper. Consider gradual partitioning instead of hard.
+The simulations can easily be extended to multiple hidden layers. These layers can be a combination of convolutional layers as well as fully connected layers. \cite{kayserdenoising} Other recent literature has pointed to recurrent neural networks as an advanced technique for de-noising which has had some success. \cite{graves2014towards} Batch normalization and layer normalization techniques can help speed up convergence in terms of wall time as well as number of minibatch iterations. \cite{2016arXiv160706450L}
+
+Additionally, the partitions can potentially be constructed to have varying degrees of signal/noise energy such that a more gradual de-noising can occur with less distortion. The partitions can also potentially span more than one layer, which might produce interesting results. Results can then be presented in terms of additional learned parameters which dictate how much of each latent variable to use in reconstruction.
+
+Other metrics could be useful as well in reporting results besides Mean Squared Error. For instance, we could measure the signal-to-distortion ratio (SDR) to identify which networks are introducing distortion and which ones are preventing it. We could also modify our MSE to report as a gain in SNR instead. If we want to preserve audio quality and measure it, we could potentially use user listening tests and audio quality metrics which are based on perceptual models of human hearing.
+
+It's also worth exploring whether or not these models might generalize to similar situations of noisy conditions but with different signals, or vise versa.
 
 \subsubsection{Data}
-Get more data. Consider different noise levels and types of signals.
+Various data sources could be considered in validating the various presented network architectures. Different signal types, e.g. various speech examples and music recordings could provide more useful insights across models and simulations. Similarly, different noise signal types, e.g. restaurant noise, train noise, and crowd noise could provide more insight into how the networks respond.
