@@ -21,16 +21,16 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{liu2014experiments}
+D.~Liu, P.~Smaragdis, and M.~Kim, ``Experiments on deep learning for speech
+  denoising.'' in \emph{INTERSPEECH}, 2014, pp. 2685--2689.
+
 \bibitem{stow}
 \BIBentryALTinterwordspacing
 D.~Stowell and R.~E. Turner, ``Denoising without access to clean data using a
   partitioned autoencoder,'' \emph{CoRR}, vol. abs/1509.05982, 2015. [Online].
   Available: \url{http://arxiv.org/abs/1509.05982}
 \BIBentrySTDinterwordspacing
-
-\bibitem{liu2014experiments}
-D.~Liu, P.~Smaragdis, and M.~Kim, ``Experiments on deep learning for speech
-  denoising.'' in \emph{INTERSPEECH}, 2014, pp. 2685--2689.
 
 \bibitem{bishop}
 C.~M. Bishop, \emph{Pattern recognition and machine learning}.\hskip 1em plus

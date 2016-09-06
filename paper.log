@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  5 SEP 2016 22:02
+This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  5 SEP 2016 22:15
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1356,11 +1356,10 @@ thesis/comparisons/autoencoder.py\", \"rb\"); hasher.update(f.read()); f.close(
 
 (./paper.mintedmd5)
 (./_minted-paper/19d5ebfce0e0a4104e3babe49a7d6ea52b08b778.pygtex
-LaTeX Font Info:    Font shape `EU1/lmtt/bx/n' in size <12> not available
+LaTeX Font Info:    Font shape `EU1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `EU1/lmtt/b/n' tried instead on input line 2.
  [45] [46]
-[47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57] [58] [59] [60] [61]
-[62] [63] [64] [65] [66] [67] [68])
+[47] [48] [49] [50] [51] [52] [53] [54] [55] [56])
 runsystem(rm "paper.mintedcmd")...executed.
 
 runsystem(rm "paper.mintedmd5")...executed.
@@ -1370,14 +1369,14 @@ runsystem(rm "paper.mintedmd5")...executed.
 Package caption Warning: Unused \captionsetup[table] on input line 27.
 See the caption package documentation for explanation.
 
-[69] (./paper.aux) ) 
+[57] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 33640 strings out of 493591
- 677553 string characters out of 6143546
- 703481 words of memory out of 5000000
- 36494 multiletter control sequences out of 15000+600000
- 13403 words of font info for 75 fonts, out of 8000000 for 9000
+ 33644 strings out of 493591
+ 677627 string characters out of 6143546
+ 707481 words of memory out of 5000000
+ 36496 multiletter control sequences out of 15000+600000
+ 13411 words of font info for 76 fonts, out of 8000000 for 9000
  1347 hyphenation exceptions out of 8191
- 55i,12n,69p,10364b,389s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,12n,69p,10364b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.pdf (77 pages).
+Output written on paper.pdf (65 pages).
