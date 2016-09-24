@@ -5,11 +5,11 @@
 \contentsline {figure}{\numberline {5}{\ignorespaces Loss at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input\relax }}{29}
 \contentsline {figure}{\numberline {6}{\ignorespaces MSE at various SNRs for Supervised Single-Layer Autoencoder with Batch Normalization at the Input\relax }}{30}
 \contentsline {figure}{\numberline {7}{\ignorespaces Loss at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input\relax }}{31}
-\contentsline {figure}{\numberline {8}{\ignorespaces MSE at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input\relax }}{31}
+\contentsline {figure}{\numberline {8}{\ignorespaces MSE at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input\relax }}{32}
 \contentsline {figure}{\numberline {9}{\ignorespaces Loss at various SNRs for Single-Layer Partitioned Autoencoder\cite {stow}\relax }}{32}
 \contentsline {figure}{\numberline {10}{\ignorespaces MSE at various SNRs for Single-Layer Partitioned Autoencoder\cite {stow}\relax }}{33}
-\contentsline {figure}{\numberline {11}{\ignorespaces Loss at various SNRs for Single-Layer Curro Autoencoder\relax }}{33}
-\contentsline {figure}{\numberline {12}{\ignorespaces MSE at various SNRs for Single-Layer Curro Autoencoder\relax }}{34}
+\contentsline {figure}{\numberline {11}{\ignorespaces Loss at various SNRs for Single-Layer Curro Autoencoder\relax }}{34}
+\contentsline {figure}{\numberline {12}{\ignorespaces MSE at various SNRs for Single-Layer Curro Autoencoder\relax }}{35}
 \contentsline {figure}{\numberline {13}{\ignorespaces Loss Comparison of Various Networks at -6 dB\relax }}{35}
 \contentsline {figure}{\numberline {14}{\ignorespaces Loss Comparison of Various Networks at -3 dB\relax }}{36}
 \contentsline {figure}{\numberline {15}{\ignorespaces Loss Comparison of Various Networks at 0 dB\relax }}{36}

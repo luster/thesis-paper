@@ -22,11 +22,11 @@ Simulations are written in Python 2.7 using Lasasgne \cite{sander_dieleman_2015_
 
 Weight updates are calculated using Adam updates \cite{DBLP:journals/corr/KingmaB14}. 2000 iterations (minibatches) are used for each simulation. Unless otherwise noted, each hidden layer uses 2000 hidden nodes.
 
-Loss-based plots show the loss function convergence during training iterations, where the l. Mean squared error plots show the MSE every 50 training examples for an inference example that does not change.
+Loss-based plots show the loss function convergence during training iterations, where the loss function is as defined in the previous section for each network architecture. Mean squared error plots show the MSE every 50 training examples for an inference example that does not change.
 
 \subsection{Supervised Autoencoder}
 
-The following results show a single-layer autoencoder with and without batch normalization at the input layer.
+The following results show a single-layer autoencoder with and without batch normalization at the input layer. We present these to compare the effects of batch normalization as well as to show the differences between supervised and semi-supervised de-noising approaches.
 
 \subsubsection{Batch Normalized Input}
 
@@ -40,7 +40,7 @@ In Figure \ref{fig:paris-bn-loss}, we can see that the loss function appears to 
 
 In Figure \ref{fig:paris-bn-mse}, we can see that the MSE generally goes down as SNR goes up. This should be expected, though perhaps there may be an error in the simulation since the lines blur a bit between -3 dB and 6 dB.
 
-Also, the saved audio from which the MSE's were calculated have some distortion introduced from the network.
+We also note from personal listening tests that the reconstructed signals have some distortion introduced from the network.
 
 \begin{figure}[!ht]
 \centering
@@ -58,7 +58,7 @@ As expected, in Figure \ref{fig:paris-loss}, the loss metric converges about the
 \caption{Loss at various SNRs for Supervised Single-Layer Autoencoder without Batch Normalization at the Input}\label{fig:paris-loss}
 \end{figure}
 
-Somewhat unexpectedly, the MSE in Figure \ref{fig:paris-mse} converges to a lower value than that of Figure \ref{fig:paris-bn-mse}. This suggests that there may be an error in the simulation, likely in using the stored statistics for batch normalization as opposed to using an on-the-fly calculation of the minibatch statistics at inference time. However, we still achieve convergence here which is expected. Past 0 dB, the MSE seems to converge to a similar value, suggesting that the network has diminishing returns for higher SNR.
+The MSE in Figure \ref{fig:paris-mse} converges to a lower value than that of Figure \ref{fig:paris-bn-mse}. This suggests that there may be an error in the simulation, likely in using the stored statistics for batch normalization as opposed to using an on-the-fly calculation of the minibatch statistics at inference time. Batch normalization usually allows for faster convergence of the loss function. This may suggest that the mean squared error of the magnitude FFT coefficients are not as directly correlated to the time-domain signal mean squared error convergence. However, we still achieve convergence here which is expected. Past 0 dB, the MSE seems to converge to a similar value, suggesting that the network has diminishing returns for higher SNR.
 
 \begin{figure}[!ht]
 \centering

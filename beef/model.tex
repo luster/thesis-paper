@@ -19,16 +19,16 @@ where $SNR_{lin}$ is given by
 SNR_{lin} = 10^{\frac{SNR_{db}}{10}}
 \end{equation}
 
-In supervised scenarios, we allow the network to train with access to the ground truth $x[n]$. On the other hand, in semi-supervised scenarios, we only allow the network to train with access to a ``soft label'' indicating if the signal is (1) noise-only or (2) noise and possibly signal. \cite{stow} However, in both supervised and semi-supervised scenarios, our neural network input is one of the following:
+In supervised scenarios, we allow the network to train with access to the ground truth $x[n]$. On the other hand, in semi-supervised scenarios, we only allow the network to train with access to a ``soft label'' indicating if the signal is (1) noise-only or (2) noise and possibly signal. \cite{stow} However, in both supervised and semi-supervised scenarios, our neural network input can be one of the following:
 
 \begin{enumerate}
     \item Frames of $y[n]$
     \item Frames of $\norm{Y[k]}$
-    \item Magnitude spectroram frames of $Y[k]$
+    \item Magnitude spectrogram frames of $Y[k]$
     \item Complex spectrogram frames of $Y[k]$
 \end{enumerate}
 
-We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames at 16 kHz with a Hanning window with 50\% overlap unless otherwise specified. In addition, for frequency frames, we use an FFT length the same length as our frame for a total of $L/2$ frequency bins. Note that our choice of frame length and sampling rate allows us to balance time and frequency resolution. With the given frame length and sampling rate, we achieve a frequency resolution of 15.625 Hz/bin by the following:
+The results we present worked best with frames of $\norm{Y[k]}$, so we show only those here. We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames at 16 kHz with a Hanning window with 50\% overlap unless otherwise specified. In addition, for frequency frames, we use an FFT length the same length as our frame for a total of $L/2$ frequency bins. Note that our choice of frame length and sampling rate allows us to balance time and frequency resolution. With the given frame length and sampling rate, we achieve a frequency resolution of 15.625 Hz/bin by the following:
 
 \begin{align}
 \dfrac{f_s/2 \:\text{Hz}}{N/2 \:\text{bins}} &= \dfrac{fs}{N}\\
@@ -41,7 +41,7 @@ Similary, our time resolution is given by
 \dfrac{N}{fs} = 64 \:\text{msec}
 \end{equation}
 
-Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$, in general using the mean squared error (MSE). For example, when our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
+Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$ using the mean squared error (MSE) to gauge the overall system performance. When our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
 
 \begin{equation}
 \hat{x[n]} = \mathscr{F}^{-1} \{ \norm{\hat{X}[k]} e^{j \angle{Y[k]}} \}
@@ -65,7 +65,7 @@ Similarly, our choice of noise signals include the following:
     \item Restaurant noise
 \end{enumerate}
 
-As mentioned above, we can use the average energy per minibatch to specify a given SNR for an experiment. We take several combinations of clean and noise signals and compare across multiple SNRs.
+We simulate AWGN using Python's Numpy library \cite{scipy}, and we obtained sample restaurant noise from YouTube. \cite{golf} As mentioned above, we can use the average energy per minibatch to specify a given SNR for an experiment. We take several combinations of clean and noise signals and compare across multiple SNRs.
 
 \subsection{Other Network Parameters}
-Since our networks involve one or more neural network layers, we show some results compared to choices of nonlinearity, number of layers (depth), and number of nodes in each layer (width). Generally, we use an identity at the network output and either the rectified linear unit (ReLU), a modified ReLU (mReLU), leaky rectify, hyperbolic tangent (tanh), or an exponential linear unit (elu).
+Since our networks involve one or more neural network layers, we show some results compared to choices of nonlinearity, number of layers (depth), and number of nodes in each layer (width). We use an identity nonlinearity at the network output, i.e. $f(x)=x$. For all other layers, we use the modified ReLU (mReLU) given in Equation \ref{eq:mrelu}.

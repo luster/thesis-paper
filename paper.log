@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  5 SEP 2016 22:15
+This is XeTeX, Version 3.14159265-2.6-0.99996 (TeX Live 2016) (preloaded format=xelatex 2016.5.22)  24 SEP 2016 14:07
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1273,11 +1273,11 @@ File: figures/currodiagram.png Graphic file (type QTm)
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf Graphic file (t
 ype QTm)
 
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf" >
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-loss.pdf" > [29]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf Graphic file (ty
 pe QTm)
 
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf" > [29]
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-mse.pdf" >
 File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-loss.pdf Gra
 phic file (type QTm)
 
@@ -1287,22 +1287,23 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-mse.pdf Grap
 hic file (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/paris-nobatchnorm-mse.pdf" >
-[31]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss.pdf Graphic fil
 e (type QTm)
- <use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss.pdf" >
+
+<use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-loss.pdf" >
+[31]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf Graphic file
  (type QTm)
-
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf" > [32]
+ <use  "../thesis/thesis/comparisons/plotfinal/pdf/dan-dense-mse.pdf" >
+[32]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf Graphic file (t
 ype QTm)
-
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf" > [33]
+ <use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-loss.pdf" >
+[33]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/curro-mse.pdf Graphic file (ty
 pe QTm)
-
-<use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-mse.pdf" > [34]
+ <use  "../thesis/thesis/comparisons/plotfinal/pdf/curro-mse.pdf" >
+[34]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss--6.pdf Graphic
  file (type QTm)
 
@@ -1323,10 +1324,12 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-6.pdf Graphic
 file (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-loss-6.pdf" >
+[35]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--6.pdf Graphic 
 file (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--6.pdf" >
+[36]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse--3.pdf Graphic 
 file (type QTm)
 
@@ -1335,15 +1338,15 @@ File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-0.pdf Graphic f
 ile (type QTm)
 
 <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-0.pdf" >
-[35]
+[37]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-3.pdf Graphic f
 ile (type QTm)
  <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-3.pdf" >
-[36]
+[38]
 File: ../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf Graphic f
 ile (type QTm)
  <use  "../thesis/thesis/comparisons/plotfinal/pdf/comparison-mse-6.pdf" >
-[37]) [38] (./conc.tex [39] [40]) [41] (./paper.bbl [42] [43]) [44]
+[39]) [40] (./conc.tex [41]) [42] (./paper.bbl [43] [44]) [45]
 \openout5 = `paper.mintedcmd'.
 
 runsystem(python -c "import hashlib; hasher = hashlib.sha1(); f = open(\"paper.
@@ -1358,8 +1361,8 @@ thesis/comparisons/autoencoder.py\", \"rb\"); hasher.update(f.read()); f.close(
 (./_minted-paper/19d5ebfce0e0a4104e3babe49a7d6ea52b08b778.pygtex
 LaTeX Font Info:    Font shape `EU1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `EU1/lmtt/b/n' tried instead on input line 2.
- [45] [46]
-[47] [48] [49] [50] [51] [52] [53] [54] [55] [56])
+ [46] [47]
+[48] [49] [50] [51] [52] [53] [54] [55] [56] [57])
 runsystem(rm "paper.mintedcmd")...executed.
 
 runsystem(rm "paper.mintedmd5")...executed.
@@ -1369,14 +1372,14 @@ runsystem(rm "paper.mintedmd5")...executed.
 Package caption Warning: Unused \captionsetup[table] on input line 27.
 See the caption package documentation for explanation.
 
-[57] (./paper.aux) ) 
+[58] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 33644 strings out of 493591
- 677627 string characters out of 6143546
+ 33648 strings out of 493591
+ 677665 string characters out of 6143546
  707481 words of memory out of 5000000
- 36496 multiletter control sequences out of 15000+600000
+ 36500 multiletter control sequences out of 15000+600000
  13411 words of font info for 76 fonts, out of 8000000 for 9000
  1347 hyphenation exceptions out of 8191
  55i,12n,69p,10364b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.pdf (65 pages).
+Output written on paper.pdf (66 pages).

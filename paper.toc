@@ -19,7 +19,7 @@
 \contentsline {section}{\numberline {3}Signal Model and Data}{15}
 \contentsline {subsection}{\numberline {3.1}Network Input and Output}{15}
 \contentsline {subsection}{\numberline {3.2}Signal and Noise Choices}{17}
-\contentsline {subsection}{\numberline {3.3}Other Network Parameters}{17}
+\contentsline {subsection}{\numberline {3.3}Other Network Parameters}{18}
 \contentsline {section}{\numberline {4}De-noising Architectures}{19}
 \contentsline {subsection}{\numberline {4.1}Supervised Autoencoder}{19}
 \contentsline {subsection}{\numberline {4.2}Partitioned Autoencoder}{21}
@@ -29,13 +29,13 @@
 \contentsline {subsection}{\numberline {5.1}Supervised Autoencoder}{29}
 \contentsline {subsubsection}{\numberline {5.1.1}Batch Normalized Input}{29}
 \contentsline {subsubsection}{\numberline {5.1.2}Non-Batch Normalized Input}{30}
-\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{32}
-\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{32}
+\contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{31}
+\contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{33}
 \contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{35}
-\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{35}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{39}
-\contentsline {subsection}{\numberline {6.1}Conclusions}{39}
-\contentsline {subsection}{\numberline {6.2}Future Work}{40}
-\contentsline {subsubsection}{\numberline {6.2.1}Models}{40}
-\contentsline {subsubsection}{\numberline {6.2.2}Data}{41}
-\contentsline {section}{\numberline {A}Simulation Code}{45}
+\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{37}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{41}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{41}
+\contentsline {subsection}{\numberline {6.2}Future Work}{41}
+\contentsline {subsubsection}{\numberline {6.2.1}Models}{41}
+\contentsline {subsubsection}{\numberline {6.2.2}Data}{42}
+\contentsline {section}{\numberline {A}Simulation Code}{46}
