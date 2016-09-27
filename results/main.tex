@@ -69,7 +69,7 @@ The MSE in Figure \ref{fig:paris-mse} converges to a lower value than that of Fi
 
 \subsection{Partitioned Autoencoder}
 
-For the dense partitioned autoencoder, the loss function appears to converge although at a slower rate in Figure \ref{fig:dan-loss}. A rerun might use more than 2000 iterations. The loss function also converges to a higher magnitude value since the network is not supervised as well as the large regularization coefficients in the loss function.
+For the dense partitioned autoencoder, the loss function appears to converge although at a slower rate in Figure \ref{fig:dan-loss}. The loss function also converges to a higher magnitude value since the network is not supervised. In addition, the large regularization term in the loss function defined in Equation \ref{eq:stowloss} contributes to the higher convergence values for the simulation. 
 
 \begin{figure}[!ht]
 \centering
@@ -91,7 +91,7 @@ The MSE is surprisingly low in Figure \ref{fig:dan-mse}. Unlike in the supervise
 
 For the Curro Autoencoder simulation, we used 2 dense layers of size 2048 each before partitioning into two 1024 networks. After the partition, we used two dense layers and an output layer for both partitions, all at size 1024.
 
-Interesting to note for the Curro Autoencoder is the fact that it converges almost as quickly across SNR, which can be seen in Figure \ref{fig:curro-loss}. This suggests that the network might have a lesser dependence on SNR than for the other networks. In terms of making the extension to a real-time system, this suggests that the Curro network outperforms the Dense Partitioned Autoencoder. On the other hand, this could suggest that the network quickly gets stuck in a local minimum and fails to reach lower convergence.
+Interesting to note for the Curro Autoencoder is the fact that it converges almost as quickly across SNR, which can be seen in Figure \ref{fig:curro-loss}. This suggests that the network might have a lesser dependence on SNR than for the other networks. For a real-time systems application, this suggests that the Curro network could outperform the Dense Partitioned Autoencoder. On the other hand, this could suggest that the network quickly gets stuck in a local minimum and fails to reach lower convergence.
 
 \begin{figure}[!ht]
 \centering
@@ -103,7 +103,7 @@ In Figure \ref{fig:curro-mse}, for -6 dB, the time-domain MSE seems to go up sli
 
 The plot shows the MSE for reconstruction using only the signal half of the network, i.e. the top half. Interestingly, a listening test indicates that summing the two partitions at the output seems to produce a lower noise volume and lower distortion than for either partition individually. This suggests that the network might not be properly partitioning. It is currently unclear as to whether or not this is the result of a bug in the code or a fundamental flaw in the network architecture. Since this network does not have additional dense layers at the summed output, it could be that the network needs to be deeper.
 
-Another theory is that the underlying symmetry in the FFT is causing the network to effectively initialize to two parallel networks. This could be mitigated by only using the first half of the FFT. Also, adding batch normalization to the rest of the layers might result in better convergence and performance.
+Another possibility is that the underlying symmetry in the FFT is causing the network to effectively initialize to two parallel networks. This could be mitigated by only using the first half of the FFT. Also, adding batch normalization to the rest of the layers might result in better convergence and performance.
 
 \begin{figure}[!ht]
 \centering
@@ -113,7 +113,8 @@ Another theory is that the underlying symmetry in the FFT is causing the network
 
 \subsection{Comparison of Loss Convergence}
 
-Since our networks have differing loss functions, it doesn't make sense to compare the converged value. Rather, we would like to compare the networks for convergence time in terms of number of iterations, i.e. number of minibatches exposed to the network. From previous figures, we should expect that the SNR might have some difference depending on the network.
+A comparison of loss functions is not reasonable 
+Since our networks have different loss functions, it does not make sense to compare them based on the converged value. Rather, we would like to compare the networks for convergence time in terms of number of iterations, i.e. number of minibatches exposed to the network. From previous figures, we should expect that the SNR might have some difference depending on the network.
 
 \begin{figure}[!ht]
 \centering
