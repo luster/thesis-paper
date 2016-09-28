@@ -4,7 +4,7 @@ Training minibatches consist of 128 examples, each with 1024-sample FFT frames o
 
 \begin{align}
 f &= [441, 549, 660, 881]\qquad \text{Hz}\\
-x[n] &= \sum_{i=0}^{3} A_i \sin{2 \pi f_i / f_s n + \phi_i}, \qquad n=0\ldots ,1023\\
+x[n] &= \sum_{i=0}^{3} A_i \sin{2 \pi f_i / f_s n + \phi_i}, \qquad n=0,\ldots ,1023\\
 A_i &\sim U(0.25, 0.75)\\
 \phi &\sim U(0, 2\pi)
 \end{align}
