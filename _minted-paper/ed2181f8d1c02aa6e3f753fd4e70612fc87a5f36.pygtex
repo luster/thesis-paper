@@ -1,0 +1,636 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{\PYGZus{}\PYGZus{}future\PYGZus{}\PYGZus{}} \PYG{k+kn}{import} \PYG{n}{division}
+\PYG{c+c1}{\PYGZsh{} different networks (autoencoder, conv autoencoder, recurrent)}
+\PYG{c+c1}{\PYGZsh{} different signals (sine, recording)}
+\PYG{c+c1}{\PYGZsh{} different noises (awgn, crowd)}
+\PYG{c+c1}{\PYGZsh{} different domains (time, freq)}
+\PYG{k+kn}{from} \PYG{n+nn}{numpy} \PYG{k+kn}{import} \PYG{n}{complex64}
+\PYG{k+kn}{import} \PYG{n+nn}{scipy}
+\PYG{k+kn}{import} \PYG{n+nn}{lasagne}
+\PYG{k+kn}{import} \PYG{n+nn}{theano}
+\PYG{k+kn}{import} \PYG{n+nn}{theano.tensor} \PYG{k+kn}{as} \PYG{n+nn}{T}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{from} \PYG{n+nn}{scikits.audiolab} \PYG{k+kn}{import} \PYG{n}{wavwrite}
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k+kn}{as} \PYG{n+nn}{plt}
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn.metrics} \PYG{k+kn}{import} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}
+
+\PYG{n}{SIMULATION\PYGZus{}SNR} \PYG{o}{=} \PYG{l+m+mi}{6}
+\PYG{n}{FILE\PYGZus{}SNR} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZob{}\PYGZcb{} dB\PYGZsq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{SIMULATION\PYGZus{}SNR}\PYG{p}{)}
+\PYG{n}{FILENAME\PYGZus{}LOSS} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}plotfinal/curro\PYGZhy{}loss.csv\PYGZsq{}}
+\PYG{n}{FILENAME\PYGZus{}MSE} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}plotfinal/curro\PYGZhy{}mse.csv\PYGZsq{}}
+\PYG{n}{LOSSFILE} \PYG{o}{=} \PYG{n+nb}{open}\PYG{p}{(}\PYG{n}{FILENAME\PYGZus{}LOSS}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}a\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{MSEFILE} \PYG{o}{=} \PYG{n+nb}{open}\PYG{p}{(}\PYG{n}{FILENAME\PYGZus{}MSE}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}a\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{LINEFMT} \PYG{o}{=} \PYG{n}{FILE\PYGZus{}SNR} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{},\PYGZob{}\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s1}{\PYGZsq{}}
+\PYG{n}{LINEFMTLOSS} \PYG{o}{=} \PYG{n}{FILE\PYGZus{}SNR} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{},\PYGZob{}\PYGZcb{},\PYGZob{}\PYGZcb{},\PYGZob{}\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s1}{\PYGZsq{}}  \PYG{c+c1}{\PYGZsh{} for dan net, we look at square loss \PYGZam{} reg loss}
+
+\PYG{n}{LATENTFILE} \PYG{o}{=} \PYG{n+nb}{open}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}plotfinal/dan\PYGZhy{}latent.csv\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}a\PYGZsq{}}\PYG{p}{)}
+
+
+\PYG{n}{dtype} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{config}\PYG{o}{.}\PYG{n}{floatX}
+\PYG{n}{batchsize} \PYG{o}{=} \PYG{l+m+mi}{128}
+\PYG{c+c1}{\PYGZsh{} framelen = 441}
+\PYG{n}{srate} \PYG{o}{=} \PYG{l+m+mi}{16000}
+\PYG{n}{pct} \PYG{o}{=} \PYG{l+m+mf}{0.5}  \PYG{c+c1}{\PYGZsh{} overlap}
+\PYG{n}{fftlen} \PYG{o}{=} \PYG{l+m+mi}{1024}
+\PYG{n}{framelen} \PYG{o}{=} \PYG{n}{fftlen}
+\PYG{c+c1}{\PYGZsh{} overlap = int(framelen/2)}
+
+\PYG{c+c1}{\PYGZsh{} dan\PYGZhy{}specific}
+\PYG{n}{shape} \PYG{o}{=} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,}\PYG{n}{framelen}\PYG{p}{)}
+\PYG{n}{latentsize} \PYG{o}{=} \PYG{l+m+mi}{2000}
+\PYG{c+c1}{\PYGZsh{}background\PYGZus{}latents\PYGZus{}factor = 0.25}
+\PYG{n}{background\PYGZus{}latents\PYGZus{}factor} \PYG{o}{=} \PYG{l+m+mf}{0.5}
+\PYG{n}{minibatch\PYGZus{}noise\PYGZus{}only\PYGZus{}factor} \PYG{o}{=} \PYG{l+m+mf}{0.5}  \PYG{c+c1}{\PYGZsh{} also for curro net}
+\PYG{n}{n\PYGZus{}noise\PYGZus{}only\PYGZus{}examples} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{minibatch\PYGZus{}noise\PYGZus{}only\PYGZus{}factor} \PYG{o}{*} \PYG{n}{batchsize}\PYG{p}{)}
+\PYG{n}{n\PYGZus{}background\PYGZus{}latents} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{background\PYGZus{}latents\PYGZus{}factor} \PYG{o}{*} \PYG{n}{latentsize}\PYG{p}{)}
+\PYG{n}{lambduh} \PYG{o}{=} \PYG{l+m+mf}{0.75}
+
+\PYG{n}{batch\PYGZus{}norm} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{batch\PYGZus{}norm}
+
+\PYG{k}{def} \PYG{n+nf}{mod\PYGZus{}relu}\PYG{p}{(}\PYG{n}{x}\PYG{p}{):}
+    \PYG{n}{eps} \PYG{o}{=} \PYG{l+m+mf}{1e\PYGZhy{}5}
+    \PYG{k}{return} \PYG{n}{T}\PYG{o}{.}\PYG{n}{switch}\PYG{p}{(}\PYG{n}{x} \PYG{o}{\PYGZgt{}} \PYG{n}{eps}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{eps}\PYG{o}{/}\PYG{p}{(}\PYG{n}{x}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{eps}\PYG{p}{))}
+
+\PYG{k}{def} \PYG{n+nf}{normalize}\PYG{p}{(}\PYG{n}{x}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{x} \PYG{o}{/} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+
+\PYG{k}{def} \PYG{n+nf}{snr\PYGZus{}after}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{x\PYGZus{}hat}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{var}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{o}{/}\PYG{n}{np}\PYG{o}{.}\PYG{n}{var}\PYG{p}{(}\PYG{n}{x}\PYG{o}{\PYGZhy{}}\PYG{n}{x\PYGZus{}hat}\PYG{p}{)}
+
+
+\PYG{k}{class} \PYG{n+nc}{ZeroOutBackgroundLatentsLayer}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{Layer}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{incoming}\PYG{p}{,} \PYG{o}{**}\PYG{n}{kwargs}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{(}\PYG{n}{ZeroOutBackgroundLatentsLayer}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{p}{)}\PYG{o}{.}\PYG{n}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n}{incoming}\PYG{p}{)}
+        \PYG{n}{mask} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{n}{batchsize}\PYG{p}{,}\PYG{n}{latentsize}\PYG{p}{))}
+        \PYG{n}{mask}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{n\PYGZus{}background\PYGZus{}latents}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mask} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{shared}\PYG{p}{(}\PYG{n}{mask}\PYG{p}{,} \PYG{n}{borrow}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{get\PYGZus{}output\PYGZus{}for}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{input\PYGZus{}data}\PYG{p}{,} \PYG{n}{reconstruct}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,} \PYG{o}{**}\PYG{n}{kwargs}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n}{reconstruct}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mask} \PYG{o}{*} \PYG{n}{input\PYGZus{}data}
+        \PYG{k}{return} \PYG{n}{input\PYGZus{}data}
+
+
+\PYG{k}{def} \PYG{n+nf}{dan\PYGZus{}net}\PYG{p}{():}
+    \PYG{c+c1}{\PYGZsh{} net}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}X\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} input}
+    \PYG{n}{y} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} soft label}
+    \PYG{n}{network} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{InputLayer}\PYG{p}{(}\PYG{n}{shape}\PYG{p}{,} \PYG{n}{x}\PYG{p}{))}
+    \PYG{c+c1}{\PYGZsh{} network = lasagne.layers.InputLayer(shape, x)}
+    \PYG{k}{print} \PYG{n}{network}\PYG{o}{.}\PYG{n}{output\PYGZus{}shape}
+    \PYG{n}{network} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{network}\PYG{p}{,} \PYG{n}{latentsize}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{mod\PYGZus{}relu}\PYG{p}{)}
+    \PYG{k}{print} \PYG{n}{network}\PYG{o}{.}\PYG{n}{output\PYGZus{}shape}
+    \PYG{n}{latents} \PYG{o}{=} \PYG{n}{network}
+    \PYG{n}{network} \PYG{o}{=} \PYG{n}{ZeroOutBackgroundLatentsLayer}\PYG{p}{(}\PYG{n}{latents}\PYG{p}{,} \PYG{n}{background\PYGZus{}latents\PYGZus{}factor}\PYG{o}{=}\PYG{n}{background\PYGZus{}latents\PYGZus{}factor}\PYG{p}{)}
+    \PYG{n}{network} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{network}\PYG{p}{,} \PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{rectify}\PYG{p}{)}
+    \PYG{k}{print} \PYG{n}{network}\PYG{o}{.}\PYG{n}{output\PYGZus{}shape}
+
+    \PYG{c+c1}{\PYGZsh{} loss}
+    \PYG{n}{C} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n}{batchsize}\PYG{p}{,}\PYG{n}{latentsize}\PYG{p}{))}
+    \PYG{n}{C}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{n\PYGZus{}noise\PYGZus{}only\PYGZus{}examples}\PYG{p}{,} \PYG{n}{n\PYGZus{}background\PYGZus{}latents} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{:]} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{n}{C\PYGZus{}mat} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{shared}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{asarray}\PYG{p}{(}\PYG{n}{C}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{borrow}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{mean\PYGZus{}C} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{shared}\PYG{p}{(}\PYG{n}{C}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(),} \PYG{n}{borrow}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{prediction} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{network}\PYG{p}{)}
+    \PYG{n}{mse\PYGZus{}term} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{keepdims}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{scf} \PYG{o}{=} \PYG{n}{lambduh}\PYG{o}{/}\PYG{n}{mean\PYGZus{}C}
+    \PYG{n}{regularization\PYGZus{}term} \PYG{o}{=} \PYG{n}{scf} \PYG{o}{*} \PYG{n}{y} \PYG{o}{*} \PYG{p}{((}\PYG{n}{C\PYGZus{}mat} \PYG{o}{*} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{latents}\PYG{p}{))}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{keepdims}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{mse\PYGZus{}term} \PYG{o}{+} \PYG{n}{regularization\PYGZus{}term}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{loss}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} training compilation}
+    \PYG{n}{params} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}all\PYGZus{}params}\PYG{p}{(}\PYG{n}{network}\PYG{p}{,} \PYG{n}{trainable}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{updates} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{updates}\PYG{o}{.}\PYG{n}{adam}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{,} \PYG{n}{params}\PYG{p}{)}
+    \PYG{n}{train\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{],} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{updates}\PYG{o}{=}\PYG{n}{updates}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} inference compilation}
+    \PYG{n}{predict\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{network}\PYG{p}{,} \PYG{n}{deterministic}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,} \PYG{n}{reconstruct}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{))}
+
+    \PYG{c+c1}{\PYGZsh{}}
+    \PYG{c+c1}{\PYGZsh{} other objectives}
+    \PYG{c+c1}{\PYGZsh{}}
+    \PYG{n}{square\PYGZus{}term} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{mse\PYGZus{}term}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{())}
+    \PYG{n}{regularization\PYGZus{}term} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{],} \PYG{n}{regularization\PYGZus{}term}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{())}
+
+    \PYG{k}{def} \PYG{n+nf}{do\PYGZus{}stuff}\PYG{p}{(}\PYG{n}{network}\PYG{p}{,} \PYG{n}{latents}\PYG{p}{,} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{):}
+        \PYG{k}{pass}
+
+    \PYG{n}{latent\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{latents}\PYG{p}{,} \PYG{n}{deterministic}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{))}
+    \PYG{k}{return} \PYG{n}{network}\PYG{p}{,} \PYG{n}{latents}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{square\PYGZus{}term}\PYG{p}{,} \PYG{n}{regularization\PYGZus{}term}\PYG{p}{,} \PYG{n}{train\PYGZus{}fn}\PYG{p}{,} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{,} \PYG{n}{do\PYGZus{}stuff}\PYG{p}{,} \PYG{n}{latent\PYGZus{}fn}
+
+\PYG{k}{def} \PYG{n+nf}{dan\PYGZus{}main}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{n}{network}\PYG{p}{,} \PYG{n}{latents}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{square\PYGZus{}loss}\PYG{p}{,} \PYG{n}{reg\PYGZus{}loss}\PYG{p}{,} \PYG{n}{train\PYGZus{}fn}\PYG{p}{,} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{,} \PYG{n}{do\PYGZus{}stuff}\PYG{p}{,} \PYG{n}{latent\PYGZus{}fn} \PYG{o}{=} \PYG{n}{dan\PYGZus{}net}\PYG{p}{()}
+    \PYG{n}{lmse} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{lsq} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{lreg} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{c+c1}{\PYGZsh{} inference example for simulations}
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n}{\PYGZus{}clean}\PYG{p}{,} \PYG{n}{\PYGZus{}noisy}\PYG{p}{,} \PYG{n}{\PYGZus{}n}\PYG{p}{,} \PYG{n}{\PYGZus{}labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} swap 0 and 1 since for dan net, 0 is signal and 1 is background}
+        \PYG{n}{\PYGZus{}labels} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{expand\PYGZus{}dims}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{\PYGZus{}labels}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{)[:,}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} labels = np.abs(labels\PYGZhy{}1).astype(dtype)}
+
+        \PYG{n}{loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}fn}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{\PYGZus{}labels}\PYG{p}{)}
+        \PYG{n}{lmse}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+
+        \PYG{n}{loss\PYGZus{}lsq} \PYG{o}{=} \PYG{n}{square\PYGZus{}loss}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+        \PYG{n}{lsq}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss\PYGZus{}lsq}\PYG{p}{)}
+
+        \PYG{n}{loss\PYGZus{}reg} \PYG{o}{=} \PYG{n}{reg\PYGZus{}loss}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{\PYGZus{}labels}\PYG{p}{)}
+        \PYG{n}{lreg}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss\PYGZus{}reg}\PYG{p}{)}
+        \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+si}{\PYGZpc{}.3E}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+si}{\PYGZpc{}.3E}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+si}{\PYGZpc{}.3E}\PYG{l+s+s1}{\PYGZsq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{i}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{loss\PYGZus{}lsq}\PYG{p}{,} \PYG{n}{loss\PYGZus{}reg}\PYG{p}{)}
+
+        \PYG{n}{LOSSFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMTLOSS}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{,} \PYG{n}{loss\PYGZus{}lsq}\PYG{p}{,} \PYG{n}{loss\PYGZus{}reg}\PYG{p}{))}
+
+        \PYG{k}{if} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{50}\PYG{p}{,} \PYG{l+m+mi}{50}\PYG{p}{):}
+            \PYG{c+c1}{\PYGZsh{} validate mse}
+            \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+            \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{noisy\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{baseline\PYGZus{}mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{,} \PYG{n}{noisy\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}baseline mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{baseline\PYGZus{}mse}
+            \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mse}
+            \PYG{n}{MSEFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMT}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{mse}\PYG{p}{))}
+
+            \PYG{n}{latentz} \PYG{o}{=} \PYG{n}{latent\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+            \PYG{n}{LATENTFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}\PYGZcb{},\PYGZob{}\PYGZcb{}\PYGZsq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{},\PYGZsq{}}\PYG{o}{.}\PYG{n}{join}\PYG{p}{([}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{latentz}\PYG{p}{])))}
+
+    \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}freq mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{cleaned\PYGZus{}up\PYGZus{}clean\PYGZus{}phase} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{noisy\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}time mse noisy phase:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}time mse clean phase:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}clean\PYGZus{}phase}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}baseline time mse noisy to clean:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}dan/x.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}time}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}dan/y.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}dan/xhat.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}clean\PYGZus{}phase}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}dan/xhat\PYGZus{}cleanphase.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lmse}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lsq}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lreg}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}overall loss\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}squared error loss\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}regularization loss\PYGZsq{}}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}dan/losses.svg\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}svg\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{paris\PYGZus{}net}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{n}{shape} \PYG{o}{=} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}x\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} dirty}
+    \PYG{n}{s} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} clean}
+    \PYG{c+c1}{\PYGZsh{}in\PYGZus{}layer = batch\PYGZus{}norm(lasagne.layers.InputLayer(shape, x))}
+    \PYG{n}{in\PYGZus{}layer} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{InputLayer}\PYG{p}{(}\PYG{n}{shape}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{h1} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{in\PYGZus{}layer}\PYG{p}{,} \PYG{l+m+mi}{2000}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{mod\PYGZus{}relu}\PYG{p}{))}
+    \PYG{n}{h1} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h1}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{identity}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} loss function}
+    \PYG{n}{prediction} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{h1}\PYG{p}{)}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction}\PYG{p}{,} \PYG{n}{s}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{h1}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(),} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{prediction}
+
+\PYG{k}{def} \PYG{n+nf}{curro\PYGZus{}net}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} input}
+    \PYG{n}{shape} \PYG{o}{=} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}x\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} dirty input}
+    \PYG{n}{label} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}label\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} noise OR signal/noise}
+
+    \PYG{n}{nonlin} \PYG{o}{=} \PYG{n}{mod\PYGZus{}relu}
+
+    \PYG{c+c1}{\PYGZsh{} network}
+    \PYG{c+c1}{\PYGZsh{} in\PYGZus{}layer = batch\PYGZus{}norm(lasagne.layers.InputLayer(shape, x))  \PYGZsh{} batch norm or no?}
+    \PYG{n}{in\PYGZus{}layer} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{InputLayer}\PYG{p}{(}\PYG{n}{shape}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{} batch norm or no?}
+    \PYG{n}{layersizes} \PYG{o}{=} \PYG{l+m+mi}{1024}\PYG{o}{*}\PYG{l+m+mi}{2}
+    \PYG{n}{h1} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{in\PYGZus{}layer}\PYG{p}{,} \PYG{n}{layersizes}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{h2} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h1}\PYG{p}{,} \PYG{n}{layersizes}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{h3} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h2}\PYG{p}{,} \PYG{n}{layersizes}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{f} \PYG{o}{=} \PYG{n}{h3}  \PYG{c+c1}{\PYGZsh{} at this point, first half is signal, second half is noise}
+
+    \PYG{c+c1}{\PYGZsh{} signal split}
+    \PYG{n}{f\PYGZus{}sig} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{SliceLayer}\PYG{p}{(}\PYG{n}{f}\PYG{p}{,} \PYG{n}{indices}\PYG{o}{=}\PYG{n+nb}{slice}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{layersizes}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{)),} \PYG{n}{axis}\PYG{o}{=\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}sig split size: \PYGZsq{}}\PYG{p}{,} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output\PYGZus{}shape}\PYG{p}{(}\PYG{n}{f\PYGZus{}sig}\PYG{p}{)}
+    \PYG{n}{sig\PYGZus{}d3} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{f\PYGZus{}sig}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} save parameters for noise split}
+    \PYG{n}{d3\PYGZus{}W} \PYG{o}{=} \PYG{n}{sig\PYGZus{}d3}\PYG{o}{.}\PYG{n}{W}
+    \PYG{n}{d3\PYGZus{}b} \PYG{o}{=} \PYG{n}{sig\PYGZus{}d3}\PYG{o}{.}\PYG{n}{b}
+    \PYG{n}{sig\PYGZus{}d2} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{sig\PYGZus{}d3}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{d2\PYGZus{}W} \PYG{o}{=} \PYG{n}{sig\PYGZus{}d2}\PYG{o}{.}\PYG{n}{W}
+    \PYG{n}{d2\PYGZus{}b} \PYG{o}{=} \PYG{n}{sig\PYGZus{}d2}\PYG{o}{.}\PYG{n}{b}
+    \PYG{n}{g\PYGZus{}sig} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{sig\PYGZus{}d2}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{identity}\PYG{p}{)}
+    \PYG{n}{gs\PYGZus{}W} \PYG{o}{=} \PYG{n}{g\PYGZus{}sig}\PYG{o}{.}\PYG{n}{W}
+    \PYG{n}{gs\PYGZus{}b} \PYG{o}{=} \PYG{n}{g\PYGZus{}sig}\PYG{o}{.}\PYG{n}{b}
+
+    \PYG{n}{f\PYGZus{}noi} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{SliceLayer}\PYG{p}{(}\PYG{n}{f}\PYG{p}{,} \PYG{n}{indices}\PYG{o}{=}\PYG{n+nb}{slice}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{layersizes}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{),}\PYG{n}{layersizes}\PYG{p}{),} \PYG{n}{axis}\PYG{o}{=\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}noisy split size: \PYGZsq{}}\PYG{p}{,} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output\PYGZus{}shape}\PYG{p}{(}\PYG{n}{f\PYGZus{}noi}\PYG{p}{)}
+    \PYG{n}{noi\PYGZus{}d3} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{f\PYGZus{}noi}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{W}\PYG{o}{=}\PYG{n}{d3\PYGZus{}W}\PYG{p}{,} \PYG{n}{b}\PYG{o}{=}\PYG{n}{d3\PYGZus{}b}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{noi\PYGZus{}d2} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{noi\PYGZus{}d3}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{W}\PYG{o}{=}\PYG{n}{d2\PYGZus{}W}\PYG{p}{,} \PYG{n}{b}\PYG{o}{=}\PYG{n}{d2\PYGZus{}b}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{nonlin}\PYG{p}{)}
+    \PYG{n}{g\PYGZus{}noi} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{noi\PYGZus{}d2}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{W}\PYG{o}{=}\PYG{n}{gs\PYGZus{}W}\PYG{p}{,} \PYG{n}{b}\PYG{o}{=}\PYG{n}{gs\PYGZus{}b}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{identity}\PYG{p}{)}
+
+    \PYG{n}{out\PYGZus{}layer} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{ElemwiseSumLayer}\PYG{p}{([}\PYG{n}{g\PYGZus{}sig}\PYG{p}{,}\PYG{n}{g\PYGZus{}noi}\PYG{p}{])}
+
+    \PYG{n}{prediction\PYGZus{}sig} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{g\PYGZus{}sig}\PYG{p}{)}
+    \PYG{n}{prediction\PYGZus{}noi} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{g\PYGZus{}noi}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} label is 1 for signal, 0 for noise}
+    \PYG{n}{prediction} \PYG{o}{=} \PYG{n}{label} \PYG{o}{*} \PYG{n}{prediction\PYGZus{}sig} \PYG{o}{+} \PYG{n}{prediction\PYGZus{}noi}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{loss\PYGZus{}sig} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction\PYGZus{}sig}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{loss\PYGZus{}noi} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction\PYGZus{}noi}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{out\PYGZus{}layer}\PYG{p}{,} \PYG{n}{g\PYGZus{}sig}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{label}\PYG{p}{,} \PYG{n}{loss}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(),} \PYG{n}{g\PYGZus{}noi}\PYG{p}{,} \PYG{n}{prediction}\PYG{p}{,} \PYG{n}{loss\PYGZus{}sig}\PYG{p}{,} \PYG{n}{loss\PYGZus{}noi}
+
+\PYG{k}{def} \PYG{n+nf}{autoencoder}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} network}
+    \PYG{n}{shape} \PYG{o}{=} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}x\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} dirty}
+    \PYG{n}{s} \PYG{o}{=} \PYG{n}{T}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} clean}
+    \PYG{n}{in\PYGZus{}layer} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{InputLayer}\PYG{p}{(}\PYG{n}{shape}\PYG{p}{,} \PYG{n}{x}\PYG{p}{))}
+    \PYG{n}{h1} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{in\PYGZus{}layer}\PYG{p}{,} \PYG{l+m+mi}{400}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{h2} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h1}\PYG{p}{,} \PYG{l+m+mi}{330}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{h3} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h2}\PYG{p}{,} \PYG{l+m+mi}{300}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{h4} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h3}\PYG{p}{,} \PYG{l+m+mi}{270}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{bottle} \PYG{o}{=} \PYG{n}{h4}
+    \PYG{n}{d4} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{h4}\PYG{p}{,} \PYG{l+m+mi}{300}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{d3} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{d4}\PYG{p}{,} \PYG{l+m+mi}{330}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{d2} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{d3}\PYG{p}{,} \PYG{l+m+mi}{400}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{leaky\PYGZus{}rectify}\PYG{p}{))}
+    \PYG{n}{x\PYGZus{}hat} \PYG{o}{=} \PYG{n}{batch\PYGZus{}norm}\PYG{p}{(}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{DenseLayer}\PYG{p}{(}\PYG{n}{d2}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{nonlinearity}\PYG{o}{=}\PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{nonlinearities}\PYG{o}{.}\PYG{n}{identity}\PYG{p}{))}
+
+    \PYG{c+c1}{\PYGZsh{} loss function}
+    \PYG{n}{prediction} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{x\PYGZus{}hat}\PYG{p}{)}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{objectives}\PYG{o}{.}\PYG{n}{squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{prediction}\PYG{p}{,} \PYG{n}{s}\PYG{p}{)}
+    \PYG{n}{reg} \PYG{o}{=} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mf}{1e\PYGZhy{}5} \PYG{o}{*} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{regularization}\PYG{o}{.}\PYG{n}{regularize\PYGZus{}network\PYGZus{}params}\PYG{p}{(}\PYG{n}{x\PYGZus{}hat}\PYG{p}{,} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{regularization}\PYG{o}{.}\PYG{n}{l2}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+          \PYG{l+m+mf}{1e\PYGZhy{}6} \PYG{o}{*} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{regularization}\PYG{o}{.}\PYG{n}{regularize\PYGZus{}network\PYGZus{}params}\PYG{p}{(}\PYG{n}{x\PYGZus{}hat}\PYG{p}{,} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{regularization}\PYG{o}{.}\PYG{n}{l1}\PYG{p}{))}
+    \PYG{n}{loss} \PYG{o}{=} \PYG{n}{loss} \PYG{o}{+} \PYG{n}{reg}
+    \PYG{k}{return} \PYG{n}{x\PYGZus{}hat}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(),} \PYG{n}{reg}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(),} \PYG{n}{prediction}
+
+\PYG{k}{def} \PYG{n+nf}{train}\PYG{p}{(}\PYG{n}{autoencoder}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{):}
+    \PYG{n}{params} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}all\PYGZus{}params}\PYG{p}{(}\PYG{n}{autoencoder}\PYG{p}{,} \PYG{n}{trainable}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{updates} \PYG{o}{=} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{updates}\PYG{o}{.}\PYG{n}{adam}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{,} \PYG{n}{params}\PYG{p}{)}
+    \PYG{n}{train\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{,}\PYG{n}{s}\PYG{p}{],} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{updates}\PYG{o}{=}\PYG{n}{updates}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{train\PYGZus{}fn}
+
+\PYG{k}{def} \PYG{n+nf}{gen\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,} \PYG{n}{f}\PYG{p}{,} \PYG{n}{srate}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{phase}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{a} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{*}\PYG{n}{f}\PYG{o}{/}\PYG{n}{srate}\PYG{o}{*}\PYG{n}{n}\PYG{o}{+}\PYG{n}{phase}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}noise\PYGZus{}var}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{,} \PYG{n}{snr\PYGZus{}db}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} we use one noise variance per minibatch}
+        \PYG{n}{avg\PYGZus{}energy} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{clean}\PYG{o}{*}\PYG{n}{clean}\PYG{p}{)}\PYG{o}{/}\PYG{n}{clean}\PYG{o}{.}\PYG{n}{size}
+        \PYG{n}{snr\PYGZus{}lin} \PYG{o}{=} \PYG{l+m+mi}{10}\PYG{o}{**}\PYG{p}{(}\PYG{n}{snr\PYGZus{}db}\PYG{o}{/}\PYG{l+m+mi}{10}\PYG{p}{)}
+        \PYG{n}{noise\PYGZus{}var} \PYG{o}{=} \PYG{n}{avg\PYGZus{}energy} \PYG{o}{/} \PYG{n}{snr\PYGZus{}lin}
+        \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+s1}{noise variance for minibatch: \PYGZsq{}}\PYG{p}{,} \PYG{n}{noise\PYGZus{}var}
+        \PYG{k}{return} \PYG{n}{noise\PYGZus{}var}
+
+    \PYG{c+c1}{\PYGZsh{} f = 440}
+    \PYG{k}{if} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{)}
+        \PYG{n}{phase1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{amp1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{framelen}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{),} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+        \PYG{n}{phase1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+    \PYG{c+c1}{\PYGZsh{} clean = amp * np.sin(2 * np.pi * f / srate * n + phase)}
+    \PYG{n}{clean} \PYG{o}{=} \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp1}\PYG{p}{,}\PYG{l+m+mi}{441}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase1}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+            \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp2}\PYG{p}{,}\PYG{l+m+mi}{549}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase2}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+            \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp3}\PYG{p}{,}\PYG{l+m+mi}{660}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase3}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+            \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp4}\PYG{p}{,}\PYG{l+m+mi}{881}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase4}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} corrupt with gaussian noise}
+    \PYG{n}{var} \PYG{o}{=} \PYG{n}{\PYGZus{}noise\PYGZus{}var}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{,} \PYG{n}{SIMULATION\PYGZus{}SNR}\PYG{p}{)}
+    \PYG{n}{noise} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{normal}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{var}\PYG{p}{,} \PYG{n}{clean}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{)}
+    \PYG{n}{noisy} \PYG{o}{=} \PYG{n}{clean} \PYG{o}{+} \PYG{n}{noise}
+
+    \PYG{k}{if} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{noisy} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{noisy}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{]} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct}\PYG{o}{*}\PYG{n}{framelen}\PYG{p}{))][}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{batchsize}\PYG{p}{])}
+        \PYG{n}{clean} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{clean}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{]} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct}\PYG{o}{*}\PYG{n}{framelen}\PYG{p}{))][}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{batchsize}\PYG{p}{])}
+        \PYG{c+c1}{\PYGZsh{}noisy = noisy.reshape(batchsize, framelen)}
+        \PYG{c+c1}{\PYGZsh{}clean = clean.reshape(batchsize, framelen)}
+
+    \PYG{k}{return} \PYG{n}{clean}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{noisy}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{n}\PYG{p}{,} \PYG{n+nb+bp}{None}
+
+\PYG{k}{def} \PYG{n+nf}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,} \PYG{n}{f}\PYG{p}{,} \PYG{n}{srate}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{phase}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{a} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{*}\PYG{n}{f}\PYG{o}{/}\PYG{n}{srate}\PYG{o}{*}\PYG{n}{n}\PYG{o}{+}\PYG{n}{phase}\PYG{p}{)}
+
+    \PYG{n}{nop} \PYG{o}{=} \PYG{n}{minibatch\PYGZus{}noise\PYGZus{}only\PYGZus{}factor}  \PYG{c+c1}{\PYGZsh{} noise only percentage of minibatch}
+    \PYG{n}{f} \PYG{o}{=} \PYG{l+m+mi}{440}
+    \PYG{k}{if} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{)}
+        \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} to get consistent samples}
+        \PYG{n}{phase1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{phase4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}
+        \PYG{n}{amp1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{amp4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{)}
+        \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{()}
+        \PYG{n}{clean} \PYG{o}{=} \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp1}\PYG{p}{,}\PYG{l+m+mi}{441}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase1}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp2}\PYG{p}{,}\PYG{l+m+mi}{549}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase2}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp3}\PYG{p}{,}\PYG{l+m+mi}{660}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase3}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp4}\PYG{p}{,}\PYG{l+m+mi}{881}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase4}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{framelen}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{),} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+        \PYG{n}{phase1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{phase4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp2} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp3} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{n}{amp4} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{batchsize}\PYG{p}{),} \PYG{p}{(}\PYG{n}{framelen}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{c+c1}{\PYGZsh{} clean = amp * np.sin(2 * np.pi * f / srate * n + phase)}
+        \PYG{n}{clean} \PYG{o}{=} \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp1}\PYG{p}{,}\PYG{l+m+mi}{441}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase1}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp2}\PYG{p}{,}\PYG{l+m+mi}{549}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase2}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp3}\PYG{p}{,}\PYG{l+m+mi}{660}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase3}\PYG{p}{)} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{\PYGZus{}sin\PYGZus{}f}\PYG{p}{(}\PYG{n}{amp4}\PYG{p}{,}\PYG{l+m+mi}{881}\PYG{p}{,}\PYG{n}{srate}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{phase4}\PYG{p}{)}
+        \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{batchsize}\PYG{o}{*}\PYG{n}{nop}\PYG{p}{),:]} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}noise\PYGZus{}var}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{,} \PYG{n}{snr\PYGZus{}db}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} we use one noise variance per minibatch}
+        \PYG{n}{avg\PYGZus{}energy} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{clean}\PYG{o}{*}\PYG{n}{clean}\PYG{p}{)}\PYG{o}{/}\PYG{n}{clean}\PYG{o}{.}\PYG{n}{size}
+        \PYG{n}{snr\PYGZus{}lin} \PYG{o}{=} \PYG{l+m+mi}{10}\PYG{o}{**}\PYG{p}{(}\PYG{n}{snr\PYGZus{}db}\PYG{o}{/}\PYG{l+m+mi}{10}\PYG{p}{)}
+        \PYG{n}{noise\PYGZus{}var} \PYG{o}{=} \PYG{n}{avg\PYGZus{}energy} \PYG{o}{/} \PYG{n}{snr\PYGZus{}lin}
+        \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+s1}{noise variance for minibatch: \PYGZsq{}}\PYG{p}{,} \PYG{n}{noise\PYGZus{}var}
+        \PYG{k}{return} \PYG{n}{noise\PYGZus{}var}
+
+    \PYG{c+c1}{\PYGZsh{} corrupt with gaussian noise}
+    \PYG{c+c1}{\PYGZsh{} use only the signal examples do determine noise variance (in both cases)}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{noise\PYGZus{}var} \PYG{o}{=} \PYG{n}{\PYGZus{}noise\PYGZus{}var}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{batchsize}\PYG{o}{*}\PYG{n}{nop}\PYG{p}{):,:],} \PYG{n}{SIMULATION\PYGZus{}SNR}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{noise\PYGZus{}var} \PYG{o}{=} \PYG{n}{\PYGZus{}noise\PYGZus{}var}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{batchsize}\PYG{o}{*}\PYG{n}{nop}\PYG{p}{):],} \PYG{n}{SIMULATION\PYGZus{}SNR}\PYG{p}{)}
+    \PYG{n}{noise} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{normal}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{noise\PYGZus{}var}\PYG{p}{,} \PYG{n}{clean}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{)}
+    \PYG{n}{noisy} \PYG{o}{=} \PYG{n}{clean} \PYG{o}{+} \PYG{n}{noise}
+
+    \PYG{k}{if} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{noisy} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{noisy}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{]} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct}\PYG{o}{*}\PYG{n}{framelen}\PYG{p}{))][}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{batchsize}\PYG{p}{])}
+        \PYG{n}{clean} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{clean}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{]} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct}\PYG{o}{*}\PYG{n}{framelen}\PYG{p}{))][}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{batchsize}\PYG{p}{])}
+
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{sample}\PYG{p}{:}
+        \PYG{n}{labels} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{n}{batchsize}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+        \PYG{n}{labels}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{batchsize}\PYG{o}{*}\PYG{n}{nop}\PYG{p}{)]}\PYG{o}{=}\PYG{l+m+mi}{0}
+        \PYG{c+c1}{\PYGZsh{} labels = np.zeros((batchsize,1))}
+        \PYG{c+c1}{\PYGZsh{} labels[0:int(batchsize*nop)]=1}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} assuming \PYGZdq{}noisy\PYGZdq{} example for sample, not noise example}
+        \PYG{n}{labels} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{n}{batchsize}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+        \PYG{c+c1}{\PYGZsh{} labels = np.zeros((batchsize,1))}
+    \PYG{n}{labels} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{(}\PYG{n}{labels}\PYG{p}{,} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{framelen}\PYG{p}{))}
+
+    \PYG{k}{return} \PYG{n}{clean}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{noisy}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{stft}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{,} \PYG{n}{overlap}\PYG{o}{=}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct}\PYG{o}{*}\PYG{n}{framelen}\PYG{p}{)):}
+    \PYG{n}{w} \PYG{o}{=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{hanning}\PYG{p}{(}\PYG{n}{framelen}\PYG{p}{)}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{scipy}\PYG{o}{.}\PYG{n}{fft}\PYG{p}{(}\PYG{n}{w}\PYG{o}{*}\PYG{n}{x}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{],} \PYG{n}{freq\PYGZus{}bins}\PYG{p}{)}
+                     \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{framelen}\PYG{p}{,} \PYG{n}{overlap}\PYG{p}{)],} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{complex64}\PYG{p}{)}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{X}\PYG{p}{),} \PYG{n}{np}\PYG{o}{.}\PYG{n}{angle}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{fft}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{):}
+    \PYG{n}{w} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tile}\PYG{p}{((}\PYG{n}{scipy}\PYG{o}{.}\PYG{n}{hanning}\PYG{p}{(}\PYG{n}{fftlen}\PYG{p}{)),} \PYG{p}{(}\PYG{n}{batchsize}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{fft}\PYG{p}{(}\PYG{n}{w}\PYG{o}{*}\PYG{n}{x}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{),} \PYG{n}{np}\PYG{o}{.}\PYG{n}{angle}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{dtype}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}data}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} for training, use FFTs of any frames}
+    \PYG{c+c1}{\PYGZsh{} for testing, use FFTs of frames with 25\PYGZpc{} overlap for proper reconstruction}
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{p}{(}\PYG{n}{sample}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} get FFTs}
+    \PYG{n}{clean\PYGZus{}stft} \PYG{o}{=} \PYG{n}{fft}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} mag, phase}
+    \PYG{n}{noisy\PYGZus{}stft} \PYG{o}{=} \PYG{n}{fft}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{,} \PYG{n}{fftlen}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} mag, phase}
+    \PYG{k}{return} \PYG{n}{clean\PYGZus{}stft}\PYG{p}{,} \PYG{n}{noisy\PYGZus{}stft}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels}  \PYG{c+c1}{\PYGZsh{} (mag, phase), (mag, phase)}
+
+\PYG{k}{def} \PYG{n+nf}{istft}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{):}
+    \PYG{n}{frames\PYGZus{}avg} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{pct}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} 4 in this case}
+    \PYG{c+c1}{\PYGZsh{} no avg first,}
+    \PYG{n}{overlap} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{pct} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}x = scipy.zeros(int(framelen/2*(time\PYGZus{}bins + 1)))}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n}{pct}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{pct}\PYG{p}{)))}
+    \PYG{k}{for} \PYG{n}{n}\PYG{p}{,}\PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{framelen}\PYG{p}{,} \PYG{n}{overlap}\PYG{p}{)):}
+        \PYG{n}{x}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{framelen}\PYG{p}{]} \PYG{o}{+=} \PYG{n}{scipy}\PYG{o}{.}\PYG{n}{real}\PYG{p}{(}\PYG{n}{scipy}\PYG{o}{.}\PYG{n}{ifft}\PYG{p}{(}\PYG{n}{X}\PYG{p}{[}\PYG{n}{n}\PYG{p}{,} \PYG{p}{:]))}
+    \PYG{k}{return} \PYG{n}{x}
+
+\PYG{k}{def} \PYG{n+nf}{ISTFT}\PYG{p}{(}\PYG{n}{mag}\PYG{p}{,} \PYG{n}{phase}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{):}
+    \PYG{n}{stft} \PYG{o}{=} \PYG{n}{mag} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{l+m+mi}{1j}\PYG{o}{*}\PYG{n}{phase}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} return np.fft.ifft(stft, framelen)}
+    \PYG{k}{return} \PYG{n}{istft}\PYG{p}{(}\PYG{n}{stft}\PYG{p}{,} \PYG{n}{framelen}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{paris\PYGZus{}main}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{n}{a}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{x\PYGZus{}hat} \PYG{o}{=} \PYG{n}{paris\PYGZus{}net}\PYG{p}{(\PYGZob{}\PYGZcb{})}
+    \PYG{n}{train\PYGZus{}fn} \PYG{o}{=} \PYG{n}{train}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,}\PYG{n}{x}\PYG{p}{,}\PYG{n}{s}\PYG{p}{,}\PYG{n}{loss}\PYG{p}{)}
+    \PYG{n}{lmse} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{predict\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{x\PYGZus{}hat}\PYG{p}{)}
+
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{()}
+
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n}{\PYGZus{}clean}\PYG{p}{,} \PYG{n}{\PYGZus{}noisy}\PYG{p}{,} \PYG{n}{\PYGZus{}n}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{()}
+        \PYG{n}{loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}fn}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{\PYGZus{}clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+        \PYG{n}{LOSSFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMT}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{))}
+        \PYG{n}{lmse}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+        \PYG{k}{print} \PYG{n}{i}\PYG{p}{,} \PYG{n}{loss}
+
+        \PYG{k}{if} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{):}
+            \PYG{c+c1}{\PYGZsh{} validate mse}
+
+            \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+            \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{noisy\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{baseline\PYGZus{}mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{,} \PYG{n}{noisy\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}baseline mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{baseline\PYGZus{}mse}
+            \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mse}
+            \PYG{n}{MSEFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMT}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{mse}\PYG{p}{))}
+
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} print \PYGZsq{}mse \PYGZsq{}, mse}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}paris/xhat.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}paris/x.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{noisy\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}paris/n.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{411}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}plt.plot(cleaned\PYGZus{}up\PYGZus{}time[0:fftlen*2])}
+    \PYG{c+c1}{\PYGZsh{}plt.plot(clean\PYGZus{}time[0:fftlen*2])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{[}\PYG{l+m+mi}{1000}\PYG{p}{:}\PYG{l+m+mi}{1250}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{[}\PYG{l+m+mi}{1000}\PYG{p}{:}\PYG{l+m+mi}{1250}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{412}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lmse}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{413}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{,:])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{414}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{unwrap}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{,:]))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}paris/x.svg\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}svg\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{curro\PYGZus{}main}\PYG{p}{(}\PYG{n}{params}\PYG{p}{):}
+    \PYG{n}{g\PYGZus{}sig}\PYG{p}{,} \PYG{n}{g\PYGZus{}sig\PYGZus{}for\PYGZus{}real}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{g\PYGZus{}noi\PYGZus{}for\PYGZus{}real}\PYG{p}{,} \PYG{n}{x\PYGZus{}hat}\PYG{p}{,} \PYG{n}{loss\PYGZus{}sig}\PYG{p}{,} \PYG{n}{loss\PYGZus{}noi} \PYG{o}{=} \PYG{n}{curro\PYGZus{}net}\PYG{p}{(\PYGZob{}\PYGZcb{})}
+    \PYG{n}{train\PYGZus{}fn} \PYG{o}{=} \PYG{n}{train}\PYG{p}{(}\PYG{n}{g\PYGZus{}sig}\PYG{p}{,}\PYG{n}{x}\PYG{p}{,}\PYG{n}{s}\PYG{p}{,}\PYG{n}{loss}\PYG{p}{)}
+    \PYG{n}{train\PYGZus{}sig} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{loss\PYGZus{}sig}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{())}
+    \PYG{n}{train\PYGZus{}noi} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{loss\PYGZus{}noi}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{())}
+    \PYG{n}{lmse} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{lsig} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{lnoi} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{predict\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{g\PYGZus{}sig\PYGZus{}for\PYGZus{}real}\PYG{p}{,} \PYG{n}{deterministic}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{))}
+    \PYG{n}{predict\PYGZus{}fn\PYGZus{}noi} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{g\PYGZus{}noi\PYGZus{}for\PYGZus{}real}\PYG{p}{,} \PYG{n}{deterministic}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{))}
+    \PYG{n}{both} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{],} \PYG{n}{lasagne}\PYG{o}{.}\PYG{n}{layers}\PYG{o}{.}\PYG{n}{get\PYGZus{}output}\PYG{p}{(}\PYG{n}{g\PYGZus{}sig}\PYG{p}{,} \PYG{n}{deterministic}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{))}
+
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{)}
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{()}
+
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n}{\PYGZus{}clean}\PYG{p}{,} \PYG{n}{\PYGZus{}noisy}\PYG{p}{,} \PYG{n}{\PYGZus{}n}\PYG{p}{,} \PYG{n}{\PYGZus{}labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{)}
+        \PYG{n}{loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}fn}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{\PYGZus{}labels}\PYG{p}{)}
+        \PYG{n}{lmse}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+
+        \PYG{n}{loss1} \PYG{o}{=} \PYG{n}{train\PYGZus{}sig}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+        \PYG{n}{lsig}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss1}\PYG{p}{)}
+
+        \PYG{n}{loss2} \PYG{o}{=} \PYG{n}{train\PYGZus{}noi}\PYG{p}{(}\PYG{n}{\PYGZus{}noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+        \PYG{n}{lnoi}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss2}\PYG{p}{)}
+
+        \PYG{k}{print} \PYG{n}{i}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{loss1}\PYG{p}{,} \PYG{n}{loss2}
+        \PYG{n}{LOSSFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMTLOSS}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{,}\PYG{n}{loss1}\PYG{p}{,}\PYG{n}{loss2}\PYG{p}{))}
+
+        \PYG{k}{if} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{params}\PYG{o}{.}\PYG{n}{niter}\PYG{o}{+}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{):}
+            \PYG{c+c1}{\PYGZsh{} validate mse}
+
+            \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+            \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{noisy\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+            \PYG{n}{baseline\PYGZus{}mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{,} \PYG{n}{noisy\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}baseline mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{baseline\PYGZus{}mse}
+            \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+            \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse:\PYGZsq{}}\PYG{p}{,} \PYG{n}{mse}
+            \PYG{n}{MSEFILE}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{n}{LINEFMT}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{mse}\PYG{p}{))}
+
+
+    \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n}{noisy\PYGZus{}reconstructed} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn\PYGZus{}noi}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n}{both\PYGZus{}ffts} \PYG{o}{=} \PYG{n}{both}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+
+    \PYG{n}{cleaned\PYGZus{}up\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{clean\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{noisy\PYGZus{}reconstructed} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}reconstructed}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+    \PYG{n}{both\PYGZus{}time} \PYG{o}{=} \PYG{n}{normalize}\PYG{p}{(}\PYG{n}{ISTFT}\PYG{p}{(}\PYG{n}{both\PYGZus{}ffts}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{fftlen}\PYG{p}{))}
+
+    \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{n}{mse\PYGZus{}noi} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}reconstructed}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{n}{mse\PYGZus{}both} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{both\PYGZus{}time}\PYG{p}{,} \PYG{n}{clean\PYGZus{}time}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}print \PYGZsq{}baseline mse\PYGZsq{}, mean\PYGZus{}squared\PYGZus{}error()  TODO: mse}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse \PYGZsq{}}\PYG{p}{,} \PYG{n}{mse}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse of noisy half \PYGZsq{}}\PYG{p}{,} \PYG{n}{mse\PYGZus{}noi}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse of combined (both) \PYGZsq{}}\PYG{p}{,} \PYG{n}{mse\PYGZus{}both}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}curro/xhat.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}curro/x.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}reconstructed}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}curro/nxhat.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{normalize}\PYG{p}{(}\PYG{n}{both\PYGZus{}time}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}curro/both.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{511}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{clean\PYGZus{}time}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{fftlen}\PYG{o}{*}\PYG{l+m+mi}{3}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{fftlen}\PYG{o}{*}\PYG{l+m+mi}{3}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{512}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lmse}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{513}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}plt.plot(cleaned\PYGZus{}up[0,:])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{fft}\PYG{o}{.}\PYG{n}{fft}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{blackman}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{o}{.}\PYG{n}{size}\PYG{p}{)}\PYG{o}{*}\PYG{n}{cleaned\PYGZus{}up\PYGZus{}time}\PYG{p}{)))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{514}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{unwrap}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{,:]))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{515}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{noisy\PYGZus{}reconstructed}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{fftlen}\PYG{o}{*}\PYG{l+m+mi}{3}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}curro/x.svg\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}svg\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{lsig}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{lnoi}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}sig\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}noi\PYGZsq{}}\PYG{p}{])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}curro/split.svg\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}svg\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{sim\PYGZus{}}\PYG{p}{():}
+    \PYG{c+c1}{\PYGZsh{} a, x, s, loss, reg, x\PYGZus{}hat = autoencoder(\PYGZob{}\PYGZcb{})}
+    \PYG{n}{a}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{loss}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{x\PYGZus{}hat} \PYG{o}{=} \PYG{n}{curro\PYGZus{}net}\PYG{p}{(\PYGZob{}\PYGZcb{})}
+    \PYG{n}{train\PYGZus{}fn} \PYG{o}{=} \PYG{n}{train}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,}\PYG{n}{x}\PYG{p}{,}\PYG{n}{s}\PYG{p}{,}\PYG{n}{loss}\PYG{p}{)}
+    \PYG{n}{loss\PYGZus{}mse} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{,} \PYG{n}{s}\PYG{p}{],} \PYG{n}{loss}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} loss\PYGZus{}reg = theano.function([], reg)}
+    \PYG{n}{lmse} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{c+c1}{\PYGZsh{} lreg = []}
+    \PYG{n}{predict\PYGZus{}fn} \PYG{o}{=} \PYG{n}{theano}\PYG{o}{.}\PYG{n}{function}\PYG{p}{([}\PYG{n}{x}\PYG{p}{,}\PYG{n}{s}\PYG{p}{],} \PYG{n}{x\PYGZus{}hat}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} clean, noisy = gen\PYGZus{}data()}
+    \PYG{c+c1}{\PYGZsh{} wavwrite(clean[1,:], \PYGZsq{}fig/s.wav\PYGZsq{}, fs=srate, enc=\PYGZsq{}pcm16\PYGZsq{})}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{xrange}\PYG{p}{(}\PYG{n}{niter}\PYG{p}{):}
+        \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}freq\PYGZus{}data}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,} \PYG{n}{gen\PYGZus{}data\PYGZus{}fn}\PYG{o}{=}\PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{)}
+        \PYG{n}{loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{,} \PYG{n}{labels}\PYG{p}{)}
+        \PYG{n}{lmse}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} lmse.append(loss\PYGZus{}mse(noisy, clean))}
+        \PYG{c+c1}{\PYGZsh{} lreg.append(loss\PYGZus{}reg())}
+        \PYG{k}{print} \PYG{n}{i}\PYG{p}{,} \PYG{n}{loss}
+    \PYG{n}{clean}\PYG{p}{,} \PYG{n}{noisy}\PYG{p}{,} \PYG{n}{n}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{gen\PYGZus{}batch\PYGZus{}half\PYGZus{}noisy\PYGZus{}half\PYGZus{}noise}\PYG{p}{(}\PYG{n}{sample}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+    \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{predict\PYGZus{}fn}\PYG{p}{(}\PYG{n}{noisy}\PYG{p}{,} \PYG{n}{labels}\PYG{p}{)}
+    \PYG{n}{cleaned\PYGZus{}up} \PYG{o}{=} \PYG{n}{cleaned\PYGZus{}up}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} mse calculation}
+    \PYG{n}{mse} \PYG{o}{=} \PYG{n}{mean\PYGZus{}squared\PYGZus{}error}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{n}{clean}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{))}
+    \PYG{k}{print} \PYG{l+s+s1}{\PYGZsq{}mse \PYGZsq{}}\PYG{p}{,} \PYG{n}{mse}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{clean}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}fig/s.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{noisy}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{batchsize} \PYG{o}{*} \PYG{n}{framelen}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}fig/xn.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{wavwrite}\PYG{p}{(}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}fig/x.wav\PYGZsq{}}\PYG{p}{,} \PYG{n}{fs}\PYG{o}{=}\PYG{n}{srate}\PYG{p}{,} \PYG{n}{enc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}pcm16\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{211}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} plt.plot(n, clean.reshape(batchsize * framelen))}
+    \PYG{c+c1}{\PYGZsh{} plt.plot(n, noisy.reshape(batchsize * framelen))}
+    \PYG{c+c1}{\PYGZsh{} plt.plot(n, cleaned\PYGZus{}up)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{n}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{framelen}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{],}\PYG{n}{clean}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{l+m+mi}{2}\PYG{p}{,:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{n}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{framelen}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{],}\PYG{n}{noisy}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{l+m+mi}{2}\PYG{p}{,:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{n}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{framelen}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{],}\PYG{n}{cleaned\PYGZus{}up}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{framelen}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{])}
+    \PYG{c+c1}{\PYGZsh{} plt.plot(n[0:framelen],cleaned\PYGZus{}up[0:framelen])}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplot}\PYG{p}{(}\PYG{l+m+mi}{212}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{lmse}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lmse}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} plt.subplot(313)}
+    \PYG{c+c1}{\PYGZsh{} plt.plot(lreg)}
+    \PYG{c+c1}{\PYGZsh{} plt.semilogy(lreg)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}fig/x.svg\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}svg\PYGZsq{}}\PYG{p}{)}
+
+
+\PYG{k}{if} \PYG{n}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{k+kn}{import} \PYG{n+nn}{sys}
+    \PYG{k+kn}{import} \PYG{n+nn}{argparse}
+    \PYG{n}{parser} \PYG{o}{=} \PYG{n}{argparse}\PYG{o}{.}\PYG{n}{ArgumentParser}\PYG{p}{()}
+    \PYG{n}{parser}\PYG{o}{.}\PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}net\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{type}\PYG{o}{=}\PYG{n+nb}{str}\PYG{p}{,} \PYG{n}{help}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}super, paris, dan, or curro\PYGZsq{}}\PYG{p}{,} \PYG{n}{default}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}super\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{parser}\PYG{o}{.}\PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZhy{}n\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}\PYGZhy{}\PYGZhy{}niter\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{type}\PYG{o}{=}\PYG{n+nb}{int}\PYG{p}{,} \PYG{n}{help}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}number of iterations\PYGZsq{}}\PYG{p}{,} \PYG{n}{default}\PYG{o}{=}\PYG{l+m+mi}{2000}\PYG{p}{)}
+    \PYG{n}{args} \PYG{o}{=} \PYG{n}{parser}\PYG{o}{.}\PYG{n}{parse\PYGZus{}args}\PYG{p}{()}
+    \PYG{n}{mapping} \PYG{o}{=} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s1}{\PYGZsq{}super\PYGZsq{}}\PYG{p}{:} \PYG{n}{autoencoder}\PYG{p}{,}
+        \PYG{l+s+s1}{\PYGZsq{}paris\PYGZsq{}}\PYG{p}{:} \PYG{n}{paris\PYGZus{}main}\PYG{p}{,}
+        \PYG{l+s+s1}{\PYGZsq{}dan\PYGZsq{}}\PYG{p}{:} \PYG{n}{dan\PYGZus{}main}\PYG{p}{,}
+        \PYG{l+s+s1}{\PYGZsq{}curro\PYGZsq{}}\PYG{p}{:} \PYG{n}{curro\PYGZus{}main}\PYG{p}{,}
+    \PYG{p}{\PYGZcb{}}
+    \PYG{n}{mapping}\PYG{p}{[}\PYG{n}{args}\PYG{o}{.}\PYG{n}{net}\PYG{p}{](}\PYG{n}{args}\PYG{p}{)}
+    \PYG{n}{LOSSFILE}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+    \PYG{n}{MSEFILE}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+    \PYG{n}{LATENTFILE}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+\end{Verbatim}

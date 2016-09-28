@@ -32,9 +32,9 @@
 \contentsline {subsection}{\numberline {5.2}Partitioned Autoencoder}{31}
 \contentsline {subsection}{\numberline {5.3}Partitioned Curro Autoencoder}{33}
 \contentsline {subsection}{\numberline {5.4}Comparison of Loss Convergence}{35}
-\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{37}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{41}
-\contentsline {subsection}{\numberline {6.1}Conclusions}{41}
+\contentsline {subsection}{\numberline {5.5}Comparison of Mean Squared Error Convergence}{36}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{40}
+\contentsline {subsection}{\numberline {6.1}Conclusions}{40}
 \contentsline {subsection}{\numberline {6.2}Future Work}{41}
 \contentsline {subsubsection}{\numberline {6.2.1}Models}{41}
 \contentsline {subsubsection}{\numberline {6.2.2}Data}{42}

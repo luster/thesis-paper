@@ -171,7 +171,7 @@ In terms of MSE convergence, we can safely compare both the convergence time and
 \caption{MSE Comparison of Networks at 0 dB}\label{fig:comp-mse-0}
 \end{figure}
 
-In Figures \cref{fig:comp-mse--6,fig:comp-mse--3,fig:comp-mse-0}, we see that at low SNR the Dense Partitioned Autoencoder usually has the highest MSE. We expect the supervised autoencoders to have lower MSE, which is the case for these figures. However, the Curro Autoencoder has better performance than the supervised systems which is somewhat unexpected. We should expect that the network which has access to the ground truth during training should converge to a lower MSE. The side effect could be a simulation error, like a bug in the code.
+In Figures \cref{fig:comp-mse--6,fig:comp-mse--3,fig:comp-mse-0}, we see that at low SNR the Dense Partitioned Autoencoder usually has the highest MSE. We expect the supervised autoencoders to have lower MSE, which is the case for these figures. However, the Curro Autoencoder has better performance than the supervised systems which is somewhat unexpected. We should expect that the network which has access to the ground truth during training should converge to a lower MSE. This could be a simulation error and is an important area of future research.
 
 \begin{figure}[!ht]
 \centering
