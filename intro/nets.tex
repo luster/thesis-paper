@@ -8,7 +8,7 @@ In this thesis, we deal only with feed-forward neural networks, which are essent
 \label{fig:nn}
 \end{figure}
 
-The connections in a nerual network can be represented by linear combinations of the input variables with learned weights $\vec{w}$. \cite{bishop} Unlike standard linear models however, neural networks apply a nonlinear activation $f(\centerdot)$ at the output of each neuron. The circle nodes in a neural network diagram can be thought of as the sum of the linear combinations of the connection edges and the application of the bias and activation function. Therefore, a hidden neuron $z_{j}$ in a network with $N$ input variable nodes, $M$ hidden nodes, and $K$ output nodes takes on the value
+The connections in a neural network can be represented by linear combinations of the input variables with learned weights $\vec{w}$. \cite{bishop} Unlike standard linear models however, neural networks apply a nonlinear activation $f(\centerdot)$ at the output of each neuron. The circle nodes in a neural network diagram can be thought of as the sum of the linear combinations of the connection edges and the application of the bias and activation function. Therefore, a hidden neuron $z_{j}$ in a network with $N$ input variable nodes, $M$ hidden nodes, and $K$ output nodes takes on the value
 
 \begin{equation}
 z_j = f(a_j)
@@ -40,9 +40,9 @@ Often, the weights and biases are grouped into a weight vector $\vec{w}$. In oth
 
 Described in the previous section, we refer to a dense layer as a fully connected neural network, in which no interconnections between neurons are missing at each layer. Dense layers can be prone to overfitting. However, as we mention later, overfitting is not an immediate concern for the purposes of this thesis.
 
-\subsubsection{Denoising Autoencoder}
+\subsubsection{De-noising Autoencoder}
 
-An autoencoder is normally an abstraction of neural networks in which an encode function $\vec{Z}=f(\vec{X})$ and a decode function $\hat{\vec{X}}=g(\vec{Z})$ are learned to learn a lower-dimensional representation of some input $\vec{X}$. \cite{stow} A denoising autoencoder is a supervised process whereby the clean input is first corrupted by some stochastic process $\vec{Y}=u(\vec{X})$. In other words, the neural network input would be a noisy input $Y$, and the network would try to learn weights such that the network output $\vec{\hat{X}}$ approximates the clean input $\vec{X}$. Another way to frame it is that your network is learning the inverse function of the noise process $u(\vec{x})$.
+An autoencoder is normally an abstraction of neural networks in which an encode function $\vec{Z}=f(\vec{X})$ and a decode function $\hat{\vec{X}}=g(\vec{Z})$ are learned to learn a lower-dimensional representation of some input $\vec{X}$. \cite{stow} A de-noising autoencoder is a supervised process whereby the clean input is first corrupted by some stochastic process $\vec{Y}=u(\vec{X})$. In other words, the neural network input would be a noisy input $Y$, and the network would try to learn weights such that the network output $\vec{\hat{X}}$ approximates the clean input $\vec{X}$. Another way to frame it is that your network is learning the inverse function of the noise process $u(\vec{x})$.
 
 % \subsubsection{Convolutional Layer}
 
@@ -76,7 +76,7 @@ g(x) &= \dfrac{\sinh{x}}{\cosh{x}}\\
 
 Note that the hyperbolic tangent function has an output on the range $(-1,1)$.
 
-Generally, our choice of nonlinearity should be chosen such that the expected range of desired output matches the nonlinearity's. In the case of audio denoising, different activations can be chosen depending on the input format. For example, time-domain audio frames are often processed with a digital floating point representation on the range of $[-1,1]$. In such a case, the hyperbolic tangent might be appropriate. On the other hand, if we were working with magnitude spectra of an audio signal, we would use a linearity with an output range of $[0,\infty]$.
+Generally, our choice of nonlinearity should be chosen such that the expected range of desired output matches the nonlinearity's. In the case of audio de-noising, different activations can be chosen depending on the input format. For example, time-domain audio frames are often processed with a digital floating point representation on the range of $[-1,1]$. In such a case, the hyperbolic tangent might be appropriate. On the other hand, if we were working with magnitude spectra of an audio signal, we would use a linearity with an output range of $[0,\infty]$.
 
 Recently, a more popular activation function which has in use is the rectified linear unit (ReLU). \cite{glorot2011deep} The ReLU is defined by the following:
 

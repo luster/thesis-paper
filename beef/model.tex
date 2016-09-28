@@ -1,7 +1,7 @@
 % explain your simulation set up, how you have clean signal, a noise signal and then a clean + noise signal. Also describe exactly what the signals you are gonna experiment with are, sine waves? clean sound + captured crowd noise? just lay all that out.
 
 \subsection{Network Input and Output}
-To simulate an audio denoising scheme, we define the following inputs and outputs. We take a known clean signal $x[n]$ which we subject to additive noise $N[n]$ using a specified SNR, resulting in the following noisy signal $y[n]$:
+To simulate an audio de-noising scheme, we define the following inputs and outputs. We take a known clean signal $x[n]$ which we subject to additive noise $N[n]$ using a specified SNR, resulting in the following noisy signal $y[n]$:
 
 \begin{equation}
 y[n] = x[n] + N[n]
@@ -31,17 +31,17 @@ In supervised scenarios, we allow the network to train with access to the ground
 The results we present worked best with frames of $\norm{Y[k]}$, so we show only those here. We choose the frame length $L$, time-domain window $w[n]$, and frame overlap percentage $p$ as hyperparameters. Generally, we use 1024-sample frames at 16 kHz with a Hanning window with 50\% overlap unless otherwise specified. In addition, for frequency frames, we use an FFT length the same length as our frame for a total of $L/2$ frequency bins. Note that our choice of frame length and sampling rate allows us to balance time and frequency resolution. With the given frame length and sampling rate, we achieve a frequency resolution of 15.625 Hz/bin by the following:
 
 \begin{align}
-\dfrac{f_s/2 \:\text{Hz}}{N/2 \:\text{bins}} &= \dfrac{fs}{N}\\
+\dfrac{f_s/2 \:\text{Hz}}{N/2 \:\text{bins}} &= \dfrac{f_s}{N}\\
 &= 15.625 \:\text{Hz/bin}
 \end{align}
 
-Similary, our time resolution is given by
+Similarly, our time resolution is given by
 
 \begin{equation}
-\dfrac{N}{fs} = 64 \:\text{msec}
+\dfrac{N}{f_s} = 64 \:\text{msec}
 \end{equation}
 
-Since we want to evaluate the level of denoising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$ using the mean squared error (MSE) to gauge the overall system performance. When our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
+Since we want to evaluate the level of de-noising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$ using the mean squared error (MSE) to gauge the overall system performance. When our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
 
 \begin{equation}
 \hat{x[n]} = \mathscr{F}^{-1} \{ \norm{\hat{X}[k]} e^{j \angle{Y[k]}} \}

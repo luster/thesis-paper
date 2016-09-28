@@ -1,4 +1,4 @@
-Domain knowledge of discrete audio signals and systems better informs our decisions for an audio denoising system, so some background information on signals and systems as it pertains to this thesis is detailed below.
+Domain knowledge of discrete audio signals and systems better informs our decisions for an audio de-noising system, so some background information on signals and systems as it pertains to this thesis is detailed below.
 
 \subsubsection{Signals}
 We deal exclusively with discrete-time audio signals in this thesis. A discrete-time audio signal $x[n]$ is represented as a sequence of numbers (samples), where each integer-valued slot $n$ in the sequence corresponds to a unit of time based on the sampling frequency $f_s$. This comes from sampling the continuous-time audio signal $x_c(t)$:
@@ -10,7 +10,7 @@ x[n] = x_c(nT)
 where $T=1/f_s$.
 For example, a 1-second speech signal sampled at 8kHz has 8000 samples. Furthermore, digital signals also have discrete valued sample amplitudes. For the purposes of this thesis, the bit depths of computers we use for analysis are high enough to allow for perfect reconstruction between continuous-time signals and digital signals.
 
-We also assume signals collected have been properly sampled according to the Nyquist-Shannon sampling theorem, which states that a discrete-time signal must be sampled at at least twice the highest frequency present in the signal to prevent aliasing of different frequencies. For example, speech signals genearlly have information up to 8kHz, so many speech signals are sampled at 16kHz. Music is more complex in that signals often span up to about 20kHz, so CD quality recordings are often sampled at 44.1kHz or higher. For this thesis, we use recordings sampled at 44.1kHz or lower.
+We also assume signals collected have been properly sampled according to the Nyquist-Shannon sampling theorem, which states that a discrete-time signal must be sampled at at least twice the highest frequency present in the signal to prevent aliasing of different frequencies. For example, speech signals generally have information up to 8kHz, so many speech signals are sampled at 16kHz. Music is more complex in that signals often span up to about 20kHz, so CD quality recordings are often sampled at 44.1kHz or higher. For this thesis, we use recordings sampled at 44.1kHz or lower.
 
 
 \subsubsection{Convolution} % TODO: figure with basic flip/slide convolution
@@ -56,10 +56,10 @@ In this thesis, we also exploit the main duality between the time and frequency 
 \mathscr{F}^{-1} \{H[k] * X[k]\} = h[n] x[n]
 \end{equation}
 
-This allows us to effectively treat our network as a non-linear filter that can denoise small time/frequency slices of our noisy signal, which can then be pieced back together using overlap-add resynthesis. We detail this in the next section.
+This allows us to effectively treat our network as a non-linear filter that can de-noise small time/frequency slices of our noisy signal, which can then be pieced back together using overlap-add resynthesis. We detail this in the next section.
 
 \subsubsection{Windowing and Perfect Reconstruction}
-To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$. Because we are training a network to denoise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT and helps to prevent spectral leakage. \cite{alan1989discrete}
+To window a signal is to multiply a window function $w[n]$ by the frame, i.e. $w[n]x[n]$ over the frame length $N$. Because we are training a network to de-noise small segments of a larger audio signal, we window the signal segments. This accommodates the finite-length requirement of the DTFT and helps to prevent spectral leakage. \cite{alan1989discrete}
 
 Also, to be able to properly reconstruct our signal, we use a window function and corresponding overlapping frame percentage to accomplish perfect reconstruction. The corresponding overlapping frame percentage is set such that the window sums to a constant for all time. For example, a rectangular window $w[n]=1$ over an interval of length $N$ has an overlap of 0\% to sum to a constant 1 for all time. Another popular window is the Hanning window, defined over an interval $N$ by the following:
 
@@ -69,13 +69,13 @@ w[n] = \dfrac{1}{2} \bigg( 1-\cos \bigg(\dfrac{2 \pi n}{N - 1} \bigg)\bigg)
 
 For the Hann window, the perfect reconstruction overlap is a frame length of $N=50\%$.
 
-\subsubsection{Window Size and Frequency v. Time Resolution Tradeoff}
+\subsubsection{Window Size and Frequency v. Time Resolution Trade-off}
 We must consider window size as a hyperparameter to our system. In general, shorter windows give rise to better time resolution at the cost of frequency resolution. On the other hand, longer windows give rise to better frequency resolution at the cost of time resolution. %To illustrate, consider FIGURE.
 
 
 
 \subsubsection{Noise and Signal-to-Noise Ratio}
-Since we are trying to denoise audio signals, we must discuss how we measure noise. One of the most common measures of degradation of signal quality from additive noise is signal-to-noise ratio (SNR), defined as the ratio of signal variance to noise variance. \cite{alan1989discrete} For the signal $y[n] = x[n] + N[n]$, where $x[n]$ is the signal of interest and $N[n]$ is the additive noise, the SNR is defined as
+Since we are trying to de-noise audio signals, we must discuss how we measure noise. One of the most common measures of degradation of signal quality from additive noise is signal-to-noise ratio (SNR), defined as the ratio of signal variance to noise variance. \cite{alan1989discrete} For the signal $y[n] = x[n] + N[n]$, where $x[n]$ is the signal of interest and $N[n]$ is the additive noise, the SNR is defined as
 
 \begin{equation}
 SNR = \dfrac{\sigma_{x}^2}{\sigma_{n}^2}

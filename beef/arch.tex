@@ -7,7 +7,7 @@ In the following sections, we detail all considered shallow network architecture
 
 \subsection{Supervised Autoencoder}
 
-We adopt the shallow supervised autoencoder from \cite{liu2014experiments}. Used for supervised denoising, we adopt the relative network size as well as their modified nonlinear activation function. The network structure is a single hidden layer, dense neural network. In other words, we can represent our network output $\hat{X_i}[k]$ for various overlapping frames $i=1,\cdots,N$ by the following:
+We adopt the shallow supervised autoencoder from \cite{liu2014experiments}. Used for supervised de-noising, we adopt the relative network size as well as their modified nonlinear activation function. The network structure is a single hidden layer, dense neural network. In other words, we can represent our network output $\hat{X_i}[k]$ for various overlapping frames $i=1,\cdots,N$ by the following:
 
 
 \begin{align}
@@ -28,7 +28,7 @@ f(x) =
     \end{cases}
 \end{equation}
 
-The choice of $\epsilon$ used in \cite{liu2014experiments} is $10^{-5}$. This modified ReLU allows for nodes to escape zero state since the derivative is always positive. An example plot of the nonlearity is given in \ref{fig:mrelu}.
+The choice of $\epsilon$ used in \cite{liu2014experiments} is $10^{-5}$. This modified ReLU allows for nodes to escape zero state since the derivative is always positive. An example plot of the nonlinearity is given in \ref{fig:mrelu}.
 
 \begin{figure}[!ht]
 \centering
@@ -49,7 +49,7 @@ For our simulations, we also apply batch normalization at the input to help trai
 
 Adopted from \cite{stow}, the partitioned autoencoder is a variation of a traditional autoencoder in which we do not know the noise corruption process or the underlying clean signals directly. This model more closely models a practical scenario. Since we don't have access to clean data, we rely instead on a ``soft'' label indicating whether we have a ``noise-only'' training example or a ``noisy'' training example which possibly has the desired signal present within it.
 
-Depending on a number of factors, a traditional autoencoder can learn many different latent representations which ultimately learn to encode and decode the underlying clean signal. A partitioned autoencoder seeks to use regularization during training to give explicit meaning to the latent variables in the network. If we can identify noise-only components in our training data, we can potentially train the network to put noise-only information into one part of the latent space. Then, the rest of the latent variables should correspond to signal-only if a sufficient representation of the noise is learned. At inference time, we can then zero out the noise-only latent variables to accomplish denoising.
+Depending on a number of factors, a traditional autoencoder can learn many different latent representations which ultimately learn to encode and decode the underlying clean signal. A partitioned autoencoder seeks to use regularization during training to give explicit meaning to the latent variables in the network. If we can identify noise-only components in our training data, we can potentially train the network to put noise-only information into one part of the latent space. Then, the rest of the latent variables should correspond to signal-only if a sufficient representation of the noise is learned. At inference time, we can then zero out the noise-only latent variables to accomplish de-noising.
 
 In \cite{stow}, they use the following loss function to accomplish effective partitioning:
 
@@ -59,7 +59,7 @@ l(\vec{Y}, y) = \norm{ \vec{Y} - \vec{\hat{X}}}^{2} + \dfrac{\lambda y}{\bar{\ve
 
 where $\vec{\hat{X}}=g(f(\vec{Y}))$, the latent variables are given by $f(\vec{Y})$, $\vec{C}$ is a masking matrix dependent on the minibatch and latent sizes taking on the value 1 for signal latents and 0 for noise or background latents. $y$ corresponds to the aforementioned soft label which has value 0 for a signal-plus-noise example and 1 for a noise-only example. $\lambda$ is a regularization coefficient which is set to a higher value than normally used for regularization to enforce zeroing out of signal-based latents for noise-only examples.
 
-In other words, when we train the network, we use minibatches with fixed ordering corresponding to the same proportion of signal-plus-noise examples and noise-only examples such that $\vec{C}$ does not change on each training iteration. An example $\vec{C}$ is given in Figure \ref{fig:cmat}. For signal-plus-noise examples, the regularization term is 0, and the network seeks to reconstruct the noisy example. However, for noise-only examples, the network tries to put all of the latent energy into the pre-determined noise-only latent variables. In \cite{stow}, they balance this by choosing 25\% of minibatches to be noise-only as well as 25\% of latent variables to be noise-only.
+In other words, when we train the network, we use minibatches with fixed ordering corresponding to the same proportion of signal-plus-noise examples and noise-only examples such that $\vec{C}$ does not change on each training iteration. An example $\vec{C}$ is given in Figure \ref{fig:cmat}. For signal-plus-noise examples, the regularization term is 0, and the network seeks to reconstruct the noisy example. However, for noise-only examples, the network tries to put all of the latent energy into the predetermined noise-only latent variables. In \cite{stow}, they balance this by choosing 25\% of minibatches to be noise-only as well as 25\% of latent variables to be noise-only.
 
 \begin{figure}[!ht]
 \centering
@@ -70,7 +70,7 @@ In other words, when we train the network, we use minibatches with fixed orderin
 
 Note that it is okay for noise-only examples to be mislabeled as signal-plus-noise, but the opposite would cause the signal to be misrepresented as noise. Therefore, the soft labeling of examples should be cautious on the side of labeling as noise-only.
 
-In \cite{stow}, they use spectrogram frames as input. Their partitioned autoencoder is constructed as a shallow two-dimensional convolutional autoencoder with input normalization to zero-mean and unit-variance, maxpooling along the time index, and a ReLU nonlinearity before the latent layer. Their convolutional layer is constructed such that the frequency space is fully connected, and the convolution happens in time. The results of their autoencoder are presented in the frequency domain only, so we seek to adapt the partitioning concept to also recover cleaner time-domain audio.
+In \cite{stow}, they use spectrogram frames as input. Their partitioned autoencoder is constructed as a shallow two-dimensional convolutional autoencoder with input normalization to zero-mean and unit-variance, max pooling along the time index, and a ReLU nonlinearity before the latent layer. Their convolutional layer is constructed such that the frequency space is fully connected, and the convolution happens in time. The results of their autoencoder are presented in the frequency domain only, so we seek to adapt the partitioning concept to also recover cleaner time-domain audio.
 
 Therefore, we use the same loss function as defined in Equation \ref{eq:stowloss}, but we use single magnitude spectrum frames and compare results on the mean squared error in the time-domain rather than in the frequency domain as their results presented. We also used the modified ReLU as presented from \cite{liu2014experiments}.
 
@@ -78,7 +78,7 @@ Therefore, we use the same loss function as defined in Equation \ref{eq:stowloss
 
 By extension, we combine the estimated magnitude spectra at the output with the original noisy phase. We can then recover a time-domain estimate of our desired signal using overlap-add resynthesis.
 
-Other experiments we tried involved trying to explicitly or implicitly estimate the clean phase. One such explicit experiment involved training a parallel partitioned autoencoder with modified nonlinearities that tried to learn a clean phase representation. However, this ended up with a worse MSE and distorted the signal than using the original noisey phase. An implicit phase estimation example involved training the network using two channels as feature maps, where the real part of the frequency spectrum made up one feature map and the imaginary part of the frequency spectrum made up the other. This also resulted in worse reconstructed signals than the case where we estimate the magnitude spectrum and combine with the noisy phase. Sample code is provided in the appendix.
+Other experiments we tried involved trying to explicitly or implicitly estimate the clean phase. One such explicit experiment involved training a parallel partitioned autoencoder with modified nonlinearities that tried to learn a clean phase representation. However, this ended up with a worse MSE and distorted the signal than using the original noisy phase. An implicit phase estimation example involved training the network using two channels as feature maps, where the real part of the frequency spectrum made up one feature map and the imaginary part of the frequency spectrum made up the other. This also resulted in worse reconstructed signals than the case where we estimate the magnitude spectrum and combine with the noisy phase. Sample code is provided in the appendix.
 
 \subsection{Curro Autoencoder}
 
