@@ -16,6 +16,7 @@
 \usepackage{listings}
 \usepackage{minted}
 \usepackage{tikz}
+\usepackage{pdfpages}
 \usepackage{caption}
 
 \graphicspath{{figures/}}
@@ -211,6 +212,7 @@ Table of Nomenclature
 The following code samples show how network architectures were constructed, how GPU functions were compiled, how networks were trained, and how simulation results were collected and plotted.
 
 \begin{center}
-\inputminted[linenos=true, fontsize=\footnotesize]{python}{../thesis/thesis/comparisons/autoencoder.py}
+% \inputminted[linenos=true, fontsize=\footnotesize]{python}{../thesis/thesis/comparisons/autoencoder.py}
+\includepdf[pages={1-},scale=0.72]{autoencoder.pdf}
 \end{center}
 \end{document}
