@@ -8,7 +8,7 @@ In this thesis, we deal only with feed-forward neural networks, which are essent
 \label{fig:nn}
 \end{figure}
 
-The connections in a neural network can be represented by linear combinations of the input variables with learned weights $\vec{w}$. \cite{bishop} Unlike standard linear models however, neural networks apply a nonlinear activation $f(\centerdot)$ at the output of each neuron. The circle nodes in a neural network diagram can be thought of as the sum of the linear combinations of the connection edges and the application of the bias and activation function. Therefore, a hidden neuron $z_{j}$ in a network with $N$ input variable nodes, $M$ hidden nodes, and $K$ output nodes takes on the value
+The connections in a neural network can be represented by linear combinations of the input variables with learned weights $\vec{w}$. \cite{bishop} Unlike standard linear models however, neural networks apply a nonlinear activation $f(\cdot)$ at the output of each neuron. The circle nodes in a neural network diagram can be thought of as the sum of the linear combinations of the connection edges and the application of the bias and activation function. Therefore, a hidden neuron $z_{j}$ in a network with $N$ input variable nodes, $M$ hidden nodes, and $K$ output nodes takes on the value
 
 \begin{equation}
 z_j = f(a_j)
@@ -32,7 +32,7 @@ where the output activation $a{k}$ is given by
 a_k = \sum_{j=1}^{M} w_{kj}^{(2)} z_j + w_{k0}^{(2)}
 \end{equation}
 
-We are free to choose activation functions, which we will discuss later. However, note that at the output, the function $g(\centerdot)$ is often an identity for regression problems and a sigmoid $\sigma(\centerdot)$ for classification problems.
+We are free to choose activation functions, which we will discuss later. However, note that at the output, the function $g(\cdot)$ is often an identity for regression problems and a sigmoid $\sigma(\cdot)$ for classification problems.
 
 Often, the weights and biases are grouped into a weight vector $\vec{w}$. In other words, similar to the linear models described earlier, a neural network is a nonlinear function of input variables $\{x_i\}$ to output variables $\{y_k\}$ where the parameters of the function are learned via training techniques.
 

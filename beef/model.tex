@@ -44,7 +44,7 @@ Similarly, our time resolution is given by
 Since we want to evaluate the level of de-noising in the time domain, we recombine the network outputs with the noisy phase components of the spectrum if necessary to obtain an estimate $\hat{x}[n]$. We then compare $\hat{x}[n]$ to $x[n]$ using the mean squared error (MSE) to gauge the overall system performance. When our network outputs frames of $\norm{\hat{X}[k]}$, we take the inverse Fast Fourier transform (IFFT) using the noisy phase $\angle{Y[k]}$ and use overlap-add to recombine the frames:
 
 \begin{equation}
-\hat{x[n]} = \mathscr{F}^{-1} \{ \norm{\hat{X}[k]} e^{j \angle{Y[k]}} \}
+\hat{x}[n] = \mathscr{F}^{-1} \{ \norm{\hat{X}[k]} e^{j \angle{Y[k]}} \}
 \end{equation}
 %(Anything to add about phase denoising and failures here?)
 
